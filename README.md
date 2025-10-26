@@ -61,14 +61,15 @@ This application allows users to:
 - [x] **Phase 3**: Complete user input system with enhanced validation - JK
 - [ ] **Phase 4**: Date range filtering and data processing
 - [ ] **Phase 5**: Interactive chart generation
-- [ ] **Phase 6**: Polish and documentation
+- [ ] **Phase 6**: Finalize testing for previous modules
+- [ ] **Phase 7**: Polish and documentation
 
 ### Phase 3 Enhancements
 
 Phase 3 has been completed with comprehensive input validation:
 
 - **Enhanced Stock Symbol Validation**
-  - Format validation (1-5 uppercase letters only)
+  - Format validation (1-5 letters forced to uppercase)
   - Helpful error messages with examples
   - Configurable retry limits
 
