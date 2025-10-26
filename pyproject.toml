@@ -96,6 +96,7 @@ omit = [
     "*/env/*",
     "*/.venv/*",
 ]
+relative_files = true
 
 [tool.coverage.report]
 precision = 2

@@ -25,6 +25,9 @@ branch = True
 # Run coverage in parallel mode (useful for multiprocessing)
 parallel = False
 
+# Write relative file paths (required for CI/CD)
+relative_files = True
+
 [report]
 # Precision for coverage percentage (2 decimal places)
 precision = 2
