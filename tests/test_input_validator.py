@@ -1,10 +1,11 @@
 # /usr/bin/env python3
 # Unit tests for input validation module
 
-import pytest
-import os
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
+import pytest
+
 from src.input_validator import (
     ValidationError,
     StockSymbolValidator,

@@ -3,6 +3,14 @@
 # Alpha Vantage API Integration for Historical Stock Data Analysis
 
 import sys
+
+from src.api_client import (
+    AlphaVantageClient,
+    APIError,
+    RateLimitError,
+    InvalidSymbolError,
+    NetworkError,
+)
 from src.constants import (
     CHART_TYPES,
     TIME_SERIES_FUNCTIONS,
@@ -36,16 +44,6 @@ def validate_environment():
         sys.exit(1)
 
 
-from datetime import datetime
-from src.api_client import (
-    AlphaVantageClient,
-    APIError,
-    RateLimitError,
-    InvalidSymbolError,
-    NetworkError,
-)
-
-
 def get_stock_symbol():
     """
     Get and validate stock symbol from user input with retry logic.
@@ -65,7 +63,7 @@ def get_stock_symbol():
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_SYMBOL_INPUT_RETRIES:
-                print(f"\nMaximum retry attempts exceeded. Exiting.")
+                print("\nMaximum retry attempts exceeded. Exiting.")
                 sys.exit(1)
             print(format_error_message(e, retry_count, MAX_SYMBOL_INPUT_RETRIES))
         except KeyboardInterrupt:
@@ -93,7 +91,7 @@ def get_chart_type():
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_CHOICE_INPUT_RETRIES:
-                print(f"\nMaximum retry attempts exceeded. Exiting.")
+                print("\nMaximum retry attempts exceeded. Exiting.")
                 sys.exit(1)
             print(format_error_message(e, retry_count, MAX_CHOICE_INPUT_RETRIES))
         except KeyboardInterrupt:
@@ -126,7 +124,7 @@ def get_time_series_function():
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_CHOICE_INPUT_RETRIES:
-                print(f"\nMaximum retry attempts exceeded. Exiting.")
+                print("\nMaximum retry attempts exceeded. Exiting.")
                 sys.exit(1)
             print(format_error_message(e, retry_count, MAX_CHOICE_INPUT_RETRIES))
         except KeyboardInterrupt:
@@ -154,29 +152,12 @@ def get_intraday_interval():
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_CHOICE_INPUT_RETRIES:
-                print(f"\nMaximum retry attempts exceeded. Exiting.")
+                print("\nMaximum retry attempts exceeded. Exiting.")
                 sys.exit(1)
             print(format_error_message(e, retry_count, MAX_CHOICE_INPUT_RETRIES))
         except KeyboardInterrupt:
             print("\n\nInput interrupted by user. Exiting.")
             sys.exit(0)
-
-
-def get_intraday_interval():
-    # Get intraday interval selection
-    print("\nAvailable intraday intervals:")
-    print("1. 1 minute")
-    print("2. 5 minutes")
-    print("3. 15 minutes")
-    print("4. 30 minutes")
-    print("5. 60 minutes")
-
-    while True:
-        choice = input("\nSelect interval (1-5): ").strip()
-        intervals = {"1": "1min", "2": "5min", "3": "15min", "4": "30min", "5": "60min"}
-        if choice in intervals:
-            return intervals[choice]
-        print("Error: Please enter a number between 1 and 5")
 
 
 def get_date_input(prompt):
@@ -205,7 +186,7 @@ def get_date_input(prompt):
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_DATE_INPUT_RETRIES:
-                print(f"\nMaximum retry attempts exceeded. Exiting.")
+                print("\nMaximum retry attempts exceeded. Exiting.")
                 sys.exit(1)
             print(format_error_message(e, retry_count, MAX_DATE_INPUT_RETRIES))
         except KeyboardInterrupt:
@@ -244,7 +225,7 @@ def get_date_range():
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_DATE_INPUT_RETRIES:
-                print(f"\nMaximum retry attempts exceeded. Exiting.")
+                print("\nMaximum retry attempts exceeded. Exiting.")
                 sys.exit(1)
             print(format_error_message(e, retry_count, MAX_DATE_INPUT_RETRIES))
         except KeyboardInterrupt:
@@ -313,7 +294,7 @@ def main():
             print(f"[PLACEHOLDER] Using {interval} interval...")
         print(f"[PLACEHOLDER] Filtering data from {begin_date} to {end_date}...")
         # Display collected information
-        print(f"\n=== Configuration Summary ===")
+        print("\n=== Configuration Summary ===")
         print(f"Stock Symbol: {symbol}")
         print(f"Chart Type: {chart_type}")
         print(f"Time Series: {time_series}")
@@ -340,7 +321,7 @@ def main():
             )
 
             # Display preview of data
-            print(f"\nData preview (first 5 rows):")
+            print("\nData preview (first 5 rows):")
             print(stock_data.head())
 
         except RateLimitError as e:

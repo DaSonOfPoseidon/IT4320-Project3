@@ -4,11 +4,13 @@
 
 import os
 import time
-import requests
-import pandas as pd
-from typing import Optional, Dict, Any, Tuple
 from datetime import datetime
+from typing import Optional, Dict, Any
+
+import pandas as pd
+import requests
 from dotenv import load_dotenv
+
 from src.cache_manager import CacheManager
 
 
@@ -24,25 +26,17 @@ DEFAULT_OUTPUT_SIZE = "full"
 class APIError(Exception):
     """Base exception for API-related errors."""
 
-    pass
-
 
 class RateLimitError(APIError):
     """Raised when API rate limit is exceeded."""
-
-    pass
 
 
 class InvalidSymbolError(APIError):
     """Raised when stock symbol is not found."""
 
-    pass
-
 
 class NetworkError(APIError):
     """Raised when network request fails."""
-
-    pass
 
 
 # Response key mappings for different time series functions
@@ -273,7 +267,7 @@ class AlphaVantageClient:
         # Cache the result
         if self.use_cache:
             self.cache_manager.save_to_cache(df, symbol, function, interval, outputsize)
-            print(f"Data cached for future use")
+            print("Data cached for future use")
 
         return df
 

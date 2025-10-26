@@ -4,8 +4,9 @@
 
 import os
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Tuple, Optional
+
 from dotenv import load_dotenv
 from src.constants import (
     SYMBOL_MIN_LENGTH,
@@ -18,8 +19,6 @@ from src.constants import (
 
 class ValidationError(Exception):
     """Custom exception for validation errors with user-friendly messages."""
-
-    pass
 
 
 class EnvironmentValidator:

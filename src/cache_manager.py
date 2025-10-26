@@ -2,12 +2,12 @@
 # Cache Manager for Stock Data API Responses
 # Implements disk-based caching to minimize API calls and support offline usage
 
-import os
 import pickle
 from datetime import datetime, timedelta
 from pathlib import Path
-import pandas as pd
 from typing import Optional, Dict, Any
+
+import pandas as pd
 
 
 # Cache configuration

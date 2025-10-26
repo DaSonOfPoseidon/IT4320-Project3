@@ -1,10 +1,11 @@
 # /usr/bin/env python3
 # Basic tests for API client and cache manager
 
-import pytest
+from unittest.mock import patch, MagicMock
+
 import pandas as pd
-from unittest.mock import patch, MagicMock, mock_open
-from datetime import datetime, timedelta
+import pytest
+
 from src.api_client import (
     AlphaVantageClient,
     APIError,

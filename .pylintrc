@@ -27,13 +27,10 @@ disable=
     missing-function-docstring,
     # Formatting (handled by black)
     line-too-long,
-    bad-continuation,
     # Less critical
     fixme,
     broad-except,
     global-statement,
-    # Allow print statements in CLI app
-    print-statement,
 
 [REPORTS]
 # Set the output format
@@ -99,7 +96,7 @@ deprecated-modules=optparse,imp
 
 [EXCEPTIONS]
 # Exceptions that will emit a warning when caught
-overgeneral-exceptions=BaseException,Exception
+overgeneral-exceptions=builtins.BaseException,builtins.Exception
 
 [SIMILARITIES]
 # Minimum lines number of a similarity

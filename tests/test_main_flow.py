@@ -1,10 +1,8 @@
 # /usr/bin/env python3
 # Integration tests for main application flow
 
-import pytest
-import sys
-from unittest.mock import patch, MagicMock, call
-from io import StringIO
+from unittest.mock import patch
+
 import main
 
 
