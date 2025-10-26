@@ -10,6 +10,9 @@ jobs:
   code-quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
@@ -41,19 +44,175 @@ jobs:
       continue-on-error: true
       run: |
         echo "::warning::Running Pylint - Issues will not fail the build"
+        mkdir -p reports
+        pylint $(git ls-files '*.py') --output-format=json > reports/pylint-report.json || true
+        pylint $(git ls-files '*.py') --output-format=text > reports/pylint-report.txt || true
         pylint $(git ls-files '*.py') || echo "Pylint found issues (warnings only)"
 
     - name: Run Black (format check)
       continue-on-error: true
       run: |
         echo "::warning::Running Black - Issues will not fail the build"
-        black --check --diff . || echo "Black found formatting issues (warnings only)"
+        mkdir -p reports
+        black --check --diff . > reports/black-report.txt 2>&1 || echo "Black found formatting issues (warnings only)"
 
     - name: Run MyPy (type check)
       continue-on-error: true
       run: |
         echo "::warning::Running MyPy - Issues will not fail the build"
-        mypy . --install-types --non-interactive || echo "MyPy found type issues (warnings only)"
+        mkdir -p reports
+        mypy . --install-types --non-interactive --txt-report reports --html-report reports/mypy-html || echo "MyPy found type issues (warnings only)"
+
+    - name: Generate Code Quality Summary
+      if: always()
+      run: |
+        echo "# Code Quality Report - Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Pylint Summary
+        if [ -f reports/pylint-report.txt ]; then
+          echo "## 📋 Pylint Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 reports/pylint-report.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        # Black Summary
+        if [ -f reports/black-report.txt ]; then
+          FILE_COUNT=$(grep -c "would reformat" reports/black-report.txt || echo "0")
+          echo "## 🎨 Black Formatting" >> $GITHUB_STEP_SUMMARY
+          echo "Files needing reformatting: **$FILE_COUNT**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        # MyPy Summary
+        echo "## 🔍 MyPy Type Checking" >> $GITHUB_STEP_SUMMARY
+        echo "See artifacts for detailed report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload Code Quality Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-quality-reports-${{ matrix.python-version }}
+        path: reports/
+        if-no-files-found: warn
+
+    - name: Post PR Comment with Code Quality Report
+      if: github.event_name == 'pull_request' && matrix.python-version == '3.11'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+
+          // Read reports
+          let pylintScore = 'N/A';
+          let pylintIssues = 0;
+          let blackFiles = 0;
+          let pylintSummary = '';
+
+          try {
+            const pylintReport = fs.readFileSync('reports/pylint-report.txt', 'utf8');
+            const scoreMatch = pylintReport.match(/Your code has been rated at ([\d.]+)\/10/);
+            if (scoreMatch) pylintScore = scoreMatch[1];
+
+            // Count specific issue types
+            const unusedImports = (pylintReport.match(/unused-import/g) || []).length;
+            const unusedVars = (pylintReport.match(/unused-variable/g) || []).length;
+            const unusedArgs = (pylintReport.match(/unused-argument/g) || []).length;
+            const fStrings = (pylintReport.match(/f-string-without-interpolation/g) || []).length;
+            const importOrder = (pylintReport.match(/wrong-import-order/g) || []).length;
+
+            pylintSummary = `
+          **Issue Breakdown:**
+          - 📦 Unused imports: ${unusedImports}
+          - 🔧 Unused variables: ${unusedVars}
+          - ⚙️ Unused arguments: ${unusedArgs}
+          - 🔤 F-strings without interpolation: ${fStrings}
+          - 📋 Import order issues: ${importOrder}
+          `;
+          } catch (e) {
+            console.log('Could not read pylint report');
+          }
+
+          try {
+            const blackReport = fs.readFileSync('reports/black-report.txt', 'utf8');
+            const matches = blackReport.match(/would reformat/g);
+            blackFiles = matches ? matches.length : 0;
+          } catch (e) {
+            console.log('Could not read black report');
+          }
+
+          // Determine emoji based on score
+          let scoreEmoji = '✅';
+          if (pylintScore !== 'N/A') {
+            const score = parseFloat(pylintScore);
+            if (score < 7) scoreEmoji = '❌';
+            else if (score < 8.5) scoreEmoji = '⚠️';
+          }
+
+          // Create comment body
+          const commentBody = `## 🤖 Code Quality Report
+
+          **Python Version:** 3.11 (latest)
+
+          ### 📊 Overall Results
+
+          | Tool | Status | Details |
+          |------|--------|---------|
+          | **Pylint** | ${scoreEmoji} **${pylintScore}/10** | Static code analysis |
+          | **Black** | ${blackFiles > 0 ? '⚠️' : '✅'} | ${blackFiles} file(s) need formatting |
+          | **MyPy** | ℹ️ | Type checking complete |
+
+          ${pylintScore !== 'N/A' ? pylintSummary : ''}
+
+          ### 📥 Detailed Reports
+
+          Download the full reports from the **Artifacts** section of this workflow run to see:
+          - \`pylint-report.json\` - Machine-readable format
+          - \`pylint-report.txt\` - Full text report
+          - \`black-report.txt\` - Formatting suggestions
+          - \`mypy-html/\` - Interactive type checking report
+
+          ### 💡 Quick Fixes
+
+          ${blackFiles > 0 ? '**Format your code:**\n```bash\nblack .\n```\n' : ''}
+          ${pylintScore !== 'N/A' && parseFloat(pylintScore) < 9 ? '**View detailed issues:**\nDownload the pylint report artifact for line-by-line suggestions.\n' : ''}
+
+          ---
+
+          <sub>📌 This comment updates automatically on each push. Current build: ${{ github.sha.substring(0, 7) }}</sub>
+          `;
+
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const botComment = comments.find(comment =>
+            comment.user.type === 'Bot' &&
+            comment.body.includes('🤖 Code Quality Report')
+          );
+
+          // Update or create comment
+          if (botComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: commentBody
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });
+          }
 
   test:
     name: Run Tests & Coverage

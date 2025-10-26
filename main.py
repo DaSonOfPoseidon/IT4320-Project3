@@ -4,12 +4,20 @@
 
 import sys
 from src.constants import (
-    CHART_TYPES, TIME_SERIES_FUNCTIONS, INTRADAY_INTERVALS,
-    MAX_SYMBOL_INPUT_RETRIES, MAX_CHOICE_INPUT_RETRIES, MAX_DATE_INPUT_RETRIES
+    CHART_TYPES,
+    TIME_SERIES_FUNCTIONS,
+    INTRADAY_INTERVALS,
+    MAX_SYMBOL_INPUT_RETRIES,
+    MAX_CHOICE_INPUT_RETRIES,
+    MAX_DATE_INPUT_RETRIES,
 )
 from src.input_validator import (
-    ValidationError, EnvironmentValidator, StockSymbolValidator,
-    DateValidator, ChoiceValidator, format_error_message
+    ValidationError,
+    EnvironmentValidator,
+    StockSymbolValidator,
+    DateValidator,
+    ChoiceValidator,
+    format_error_message,
 )
 
 
@@ -71,7 +79,7 @@ def get_chart_type():
         try:
             choice = input(f"\nSelect chart type (1-{len(CHART_TYPES)}): ").strip()
             validated = ChoiceValidator.validate_choice(choice, CHART_TYPES, "Chart type")
-            return CHART_TYPES[validated]['key']
+            return CHART_TYPES[validated]["key"]
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_CHOICE_INPUT_RETRIES:
@@ -97,10 +105,14 @@ def get_time_series_function():
     retry_count = 0
     while retry_count < MAX_CHOICE_INPUT_RETRIES:
         try:
-            choice = input(f"\nSelect time series function (1-{len(TIME_SERIES_FUNCTIONS)}): ").strip()
-            validated = ChoiceValidator.validate_choice(choice, TIME_SERIES_FUNCTIONS, "Time series function")
+            choice = input(
+                f"\nSelect time series function (1-{len(TIME_SERIES_FUNCTIONS)}): "
+            ).strip()
+            validated = ChoiceValidator.validate_choice(
+                choice, TIME_SERIES_FUNCTIONS, "Time series function"
+            )
             config = TIME_SERIES_FUNCTIONS[validated]
-            return config['key'], config['requires_interval']
+            return config["key"], config["requires_interval"]
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_CHOICE_INPUT_RETRIES:
@@ -128,7 +140,7 @@ def get_intraday_interval():
         try:
             choice = input(f"\nSelect interval (1-{len(INTRADAY_INTERVALS)}): ").strip()
             validated = ChoiceValidator.validate_choice(choice, INTRADAY_INTERVALS, "Interval")
-            return INTRADAY_INTERVALS[validated]['key']
+            return INTRADAY_INTERVALS[validated]["key"]
         except ValidationError as e:
             retry_count += 1
             if retry_count >= MAX_CHOICE_INPUT_RETRIES:
@@ -213,7 +225,9 @@ def get_date_range():
             sys.exit(0)
 
 
-def display_configuration_summary(symbol, chart_type, time_series, begin_date, end_date, interval=None):
+def display_configuration_summary(
+    symbol, chart_type, time_series, begin_date, end_date, interval=None
+):
     """
     Display collected configuration in a formatted summary.
 

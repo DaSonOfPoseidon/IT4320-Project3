@@ -8,14 +8,17 @@ from datetime import datetime, timedelta
 from typing import Tuple, Optional
 from dotenv import load_dotenv
 from src.constants import (
-    SYMBOL_MIN_LENGTH, SYMBOL_MAX_LENGTH,
-    DATE_FORMAT, DATE_FORMAT_DISPLAY,
-    MAX_DATE_RANGE_YEARS
+    SYMBOL_MIN_LENGTH,
+    SYMBOL_MAX_LENGTH,
+    DATE_FORMAT,
+    DATE_FORMAT_DISPLAY,
+    MAX_DATE_RANGE_YEARS,
 )
 
 
 class ValidationError(Exception):
     """Custom exception for validation errors with user-friendly messages."""
+
     pass
 
 
@@ -33,7 +36,7 @@ class EnvironmentValidator:
         Raises:
             ValidationError: If .env file is missing or API key is not configured
         """
-        env_path = '.env'
+        env_path = ".env"
 
         if not os.path.exists(env_path):
             raise ValidationError(
@@ -46,9 +49,9 @@ class EnvironmentValidator:
 
         # Load environment variables
         load_dotenv()
-        api_key = os.getenv('ALPHA_VANTAGE_API_KEY', '').strip()
+        api_key = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
 
-        if not api_key or api_key == 'your_api_key_here':
+        if not api_key or api_key == "your_api_key_here":
             raise ValidationError(
                 "Configuration Error: API key not configured\n"
                 "Please edit .env file and add your Alpha Vantage API key:\n"
@@ -96,7 +99,7 @@ class StockSymbolValidator:
             )
 
         # Validate format: only uppercase letters allowed
-        if not re.match(r'^[A-Z]+$', symbol):
+        if not re.match(r"^[A-Z]+$", symbol):
             raise ValidationError(
                 "Stock symbol must contain only letters (no numbers or special characters)\n"
                 f"Invalid: {symbol}\n"
@@ -146,8 +149,9 @@ class DateValidator:
         return date_str, parsed_date
 
     @staticmethod
-    def validate_date_range(begin_date: datetime, end_date: datetime,
-                          begin_str: str, end_str: str) -> Tuple[str, str]:
+    def validate_date_range(
+        begin_date: datetime, end_date: datetime, begin_str: str, end_str: str
+    ) -> Tuple[str, str]:
         """
         Validate that date range is logical and reasonable.
 
@@ -184,9 +188,13 @@ class DateValidator:
 
         # Warning for large daily ranges (informational, not blocking)
         if years_diff > 5 and date_diff.days > 1825:
-            return begin_str, end_str, (
-                f"Note: Large date range ({years_diff:.1f} years) may result in "
-                f"slower API responses and large datasets"
+            return (
+                begin_str,
+                end_str,
+                (
+                    f"Note: Large date range ({years_diff:.1f} years) may result in "
+                    f"slower API responses and large datasets"
+                ),
             )
 
         return begin_str, end_str, None
@@ -203,7 +211,7 @@ class DateValidator:
             Warning message if weekend, None otherwise
         """
         if date_obj.weekday() >= 5:  # Saturday = 5, Sunday = 6
-            day_name = date_obj.strftime('%A')
+            day_name = date_obj.strftime("%A")
             return f"Note: {date_obj.strftime(DATE_FORMAT)} is a {day_name} (market closed)"
         return None
 
@@ -233,7 +241,7 @@ class ChoiceValidator:
             raise ValidationError(f"{choice_type} cannot be empty")
 
         if choice not in valid_choices:
-            valid_options = ', '.join(sorted(valid_choices.keys()))
+            valid_options = ", ".join(sorted(valid_choices.keys()))
             raise ValidationError(
                 f"Invalid {choice_type.lower()}\n"
                 f"Valid options: {valid_options}\n"
@@ -256,7 +264,11 @@ def format_error_message(error: Exception, retry_count: int, max_retries: int) -
         Formatted error message string
     """
     remaining = max_retries - retry_count
-    retry_info = f"({remaining} attempt{'s' if remaining != 1 else ''} remaining)" if remaining > 0 else "(last attempt)"
+    retry_info = (
+        f"({remaining} attempt{'s' if remaining != 1 else ''} remaining)"
+        if remaining > 0
+        else "(last attempt)"
+    )
 
     return f"\nError: {str(error)} {retry_info}\n"
 
@@ -279,9 +291,9 @@ def confirm_large_date_range(years: float) -> bool:
 
     while True:
         response = input("\nDo you want to continue? (yes/no): ").strip().lower()
-        if response in ['yes', 'y']:
+        if response in ["yes", "y"]:
             return True
-        elif response in ['no', 'n']:
+        elif response in ["no", "n"]:
             return False
         else:
             print("Please enter 'yes' or 'no'")

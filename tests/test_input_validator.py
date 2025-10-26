@@ -6,8 +6,12 @@ import os
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 from src.input_validator import (
-    ValidationError, StockSymbolValidator, DateValidator,
-    ChoiceValidator, EnvironmentValidator, format_error_message
+    ValidationError,
+    StockSymbolValidator,
+    DateValidator,
+    ChoiceValidator,
+    EnvironmentValidator,
+    format_error_message,
 )
 from src.constants import CHART_TYPES, TIME_SERIES_FUNCTIONS
 
@@ -84,13 +88,13 @@ class TestDateValidator:
 
     def test_future_date_rejection(self):
         """Test that future dates are rejected."""
-        tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
         with pytest.raises(ValidationError, match="cannot be in the future"):
             DateValidator.parse_date(tomorrow)
 
     def test_today_date_accepted(self):
         """Test that today's date is accepted."""
-        today = datetime.now().strftime('%Y-%m-%d')
+        today = datetime.now().strftime("%Y-%m-%d")
         date_str, date_obj = DateValidator.parse_date(today)
         assert date_str == today
 
@@ -171,13 +175,13 @@ class TestChoiceValidator:
 
     def test_valid_chart_type_choice(self):
         """Test valid chart type selection."""
-        result = ChoiceValidator.validate_choice('1', CHART_TYPES, "Chart type")
-        assert result == '1'
+        result = ChoiceValidator.validate_choice("1", CHART_TYPES, "Chart type")
+        assert result == "1"
 
     def test_valid_time_series_choice(self):
         """Test valid time series selection."""
-        result = ChoiceValidator.validate_choice('3', TIME_SERIES_FUNCTIONS, "Time series")
-        assert result == '3'
+        result = ChoiceValidator.validate_choice("3", TIME_SERIES_FUNCTIONS, "Time series")
+        assert result == "3"
 
     def test_empty_choice(self):
         """Test empty choice handling."""
@@ -187,32 +191,32 @@ class TestChoiceValidator:
     def test_invalid_choice_number(self):
         """Test invalid choice number."""
         with pytest.raises(ValidationError, match="Invalid"):
-            ChoiceValidator.validate_choice('99', CHART_TYPES, "Chart type")
+            ChoiceValidator.validate_choice("99", CHART_TYPES, "Chart type")
 
     def test_non_numeric_choice(self):
         """Test non-numeric choice."""
         with pytest.raises(ValidationError, match="Invalid"):
-            ChoiceValidator.validate_choice('abc', CHART_TYPES, "Chart type")
+            ChoiceValidator.validate_choice("abc", CHART_TYPES, "Chart type")
 
     def test_whitespace_handling(self):
         """Test that whitespace is properly trimmed in choices."""
-        result = ChoiceValidator.validate_choice('  1  ', CHART_TYPES, "Chart type")
-        assert result == '1'
+        result = ChoiceValidator.validate_choice("  1  ", CHART_TYPES, "Chart type")
+        assert result == "1"
 
 
 class TestEnvironmentValidator:
     """Test cases for environment validation."""
 
-    @patch('os.path.exists')
+    @patch("os.path.exists")
     def test_missing_env_file(self, mock_exists):
         """Test validation when .env file is missing."""
         mock_exists.return_value = False
         with pytest.raises(ValidationError, match="not found"):
             EnvironmentValidator.validate_env_file()
 
-    @patch('os.path.exists')
-    @patch('src.input_validator.load_dotenv')
-    @patch('os.getenv')
+    @patch("os.path.exists")
+    @patch("src.input_validator.load_dotenv")
+    @patch("os.getenv")
     def test_empty_api_key(self, mock_getenv, mock_load_dotenv, mock_exists):
         """Test validation when API key is empty."""
         mock_exists.return_value = True
@@ -220,9 +224,9 @@ class TestEnvironmentValidator:
         with pytest.raises(ValidationError, match="not configured"):
             EnvironmentValidator.validate_env_file()
 
-    @patch('os.path.exists')
-    @patch('src.input_validator.load_dotenv')
-    @patch('os.getenv')
+    @patch("os.path.exists")
+    @patch("src.input_validator.load_dotenv")
+    @patch("os.getenv")
     def test_placeholder_api_key(self, mock_getenv, mock_load_dotenv, mock_exists):
         """Test validation when API key is placeholder."""
         mock_exists.return_value = True
@@ -230,9 +234,9 @@ class TestEnvironmentValidator:
         with pytest.raises(ValidationError, match="not configured"):
             EnvironmentValidator.validate_env_file()
 
-    @patch('os.path.exists')
-    @patch('src.input_validator.load_dotenv')
-    @patch('os.getenv')
+    @patch("os.path.exists")
+    @patch("src.input_validator.load_dotenv")
+    @patch("os.getenv")
     def test_valid_api_key(self, mock_getenv, mock_load_dotenv, mock_exists):
         """Test validation with valid API key."""
         mock_exists.return_value = True
