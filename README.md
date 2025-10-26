@@ -73,6 +73,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 ├── .env.example              # Environment variable template
 ├── tests/                    # Test suite
 │   ├── __init__.py
+│   ├── test_input_validator.py   # Unit tests for validation
+│   └── test_main_flow.py         # Integration tests
+└── src/
+    ├── __init__.py           # Package initialization
+    ├── constants.py          # Configuration constants
+    ├── input_validator.py    # Input validation utilities
+    ├── api_client.py         # Alpha Vantage API integration
 │   └── test_api_client.py    # API client and cache tests
 └── src/
     ├── __init__.py           # Package initialization
@@ -84,12 +91,75 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 ## Development Phases
 
-- [x] **Phase 1**: Basic CLI skeleton
-- [x] **Phase 2**: Alpha Vantage API integration with caching
-- [ ] **Phase 3**: Complete user input system
+- [x] **Phase 1**: Basic CLI skeleton - JK
+- [x] **Phase 2**: Alpha Vantage API integration with caching - JK
+- [x] **Phase 3**: Complete user input system with enhanced validation - JK
 - [ ] **Phase 4**: Date range filtering and data processing
 - [ ] **Phase 5**: Interactive chart generation
-- [ ] **Phase 6**: Polish and documentation
+- [ ] **Phase 6**: Finalize testing for previous modules
+- [ ] **Phase 7**: Polish and documentation
+
+### Phase 3 Enhancements
+
+Phase 3 has been completed with comprehensive input validation:
+
+- **Enhanced Stock Symbol Validation**
+  - Format validation (1-5 letters forced to uppercase)
+  - Helpful error messages with examples
+  - Configurable retry limits
+
+- **Intraday Interval Selection**
+  - Automatically prompted for TIME_SERIES_INTRADAY
+  - Five interval options (1min, 5min, 15min, 30min, 60min)
+  - Smart conditional prompting
+
+- **Advanced Date Validation**
+  - Future date detection and rejection
+  - Weekend/market closure warnings
+  - Date range validation (max 20 years)
+  - Leap year handling
+  - Invalid calendar date detection
+
+- **Environment Configuration Validation**
+  - .env file existence check at startup
+  - API key configuration validation
+  - Clear setup instructions on failure
+
+- **Robust Error Handling**
+  - Maximum retry limits prevent infinite loops
+  - Keyboard interrupt (Ctrl+C) handling at all input points
+  - Consistent error message formatting
+  - Retry attempt tracking
+
+- **Testing Suite**
+  - 59 comprehensive tests (100% passing)
+  - Unit tests for all validators
+  - Integration tests for complete user flows
+  - Edge case coverage (leap years, weekends, boundaries)
+
+## Testing
+
+Run the comprehensive test suite:
+
+```bash
+# Install dependencies (if not already installed)
+pip install -r requirements.txt
+
+# Run all tests
+python -m pytest tests/
+
+# Run with verbose output
+python -m pytest tests/ -v
+
+# Run specific test file
+python -m pytest tests/test_input_validator.py
+```
+
+**Test Coverage:**
+- 59 tests covering all validation logic
+- Unit tests for individual validators
+- Integration tests for complete application flows
+- Edge case and error condition testing
 
 ### Phase 2 Enhancements
 
@@ -182,10 +252,10 @@ This project uses the Alpha Vantage API for historical stock data.
 
 ## Team Members
 
-- DaSonOfPoseidon
-- 2
-- 3
-- 4
+- Jackson K
+- Supreet A
+- Stephen B
+- Jack H
 
 ## License
 
