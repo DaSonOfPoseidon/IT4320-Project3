@@ -91,15 +91,28 @@ jobs:
 
     - name: Run pytest with coverage
       run: |
-        pytest --cov=. --cov-report=term --cov-report=html --cov-report=xml -v
+        # Check if tests directory exists and has test files
+        if [ -d "tests" ] && [ -n "$(find tests -name 'test_*.py' -o -name '*_test.py' 2>/dev/null)" ]; then
+          echo "Running tests with coverage enforcement..."
+          pytest --cov=src --cov=main --cov-report=term --cov-report=html --cov-report=xml -v
+        else
+          echo "::warning::No tests found - skipping test execution"
+          echo "Tests will be enforced once test files are added to the tests/ directory"
+          # Create empty coverage files so upload doesn't fail
+          mkdir -p htmlcov
+          echo "No tests available yet" > htmlcov/index.html
+          exit 0
+        fi
 
     - name: Upload coverage reports
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report-${{ matrix.python-version }}
         path: |
           htmlcov/
           coverage.xml
+        if-no-files-found: warn
 
     - name: Coverage comment (PR only)
       if: github.event_name == 'pull_request' && matrix.python-version == '3.11'

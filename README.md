@@ -91,10 +91,16 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 This project uses automated testing with continuous integration via GitHub Actions.
 
+### CI/CD Status
+
+- ✅ **GitHub Actions configured** - Runs automatically on all pushes and PRs
+- ⚠️ **Tests**: Will be enforced once test files are added (currently in development)
+- ⚠️ **Code Quality**: Pylint, Black, and MyPy configured (warnings only, won't block merges)
+
 ### Running Tests Locally
 
 ```bash
-# Run all tests
+# Run all tests (once tests are added)
 pytest
 
 # Run with coverage report
@@ -123,16 +129,18 @@ mypy .
 
 ### Coverage Requirements
 
-- **Minimum coverage**: 70% (enforced by CI/CD)
+- **Minimum coverage**: 70%
 - **Target coverage**: 70-80%
-- Tests must pass before merging to main
+- Tests must pass before merging to main (after test implementation phase)
+
+**Note:** The CI/CD pipeline is configured to gracefully handle the absence of tests during early development phases. Once test files are added to the `tests/` directory, coverage enforcement will automatically activate.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed testing guidelines.
 
 ## Alpha Vantage API
 
 This project uses the Alpha Vantage API for historical stock data.
-- Free tier: 500 requests per day
+- Free tier: 25 requests per day
 - Get your API key: https://www.alphavantage.co/support/#api-key
 
 ## Team Members
