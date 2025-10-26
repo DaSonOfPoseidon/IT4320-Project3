@@ -306,3 +306,109 @@ jobs:
         fi
 
         echo "::notice::Build completed successfully!"
+
+  merge-check:
+    name: Merge Status Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - name: Check if PR is mergeable
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: pr } = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number,
+          });
+
+          const mergeable = pr.mergeable;
+          const mergeableState = pr.mergeable_state;
+
+          let status = '';
+          let emoji = '';
+
+          if (mergeable === true) {
+            status = '✅ **Ready to merge** - No conflicts detected';
+            emoji = '✅';
+          } else if (mergeable === false) {
+            status = '❌ **Merge conflicts detected** - Please resolve conflicts';
+            emoji = '❌';
+          } else {
+            status = '⏳ **Checking...** - Merge status being computed';
+            emoji = '⏳';
+          }
+
+          // Create summary for Actions UI
+          await core.summary
+            .addHeading('Merge Status Check')
+            .addRaw(status)
+            .addTable([
+              [{data: 'Property', header: true}, {data: 'Value', header: true}],
+              ['Mergeable State', mergeableState],
+              ['Base Branch', pr.base.ref],
+              ['Head Branch', pr.head.ref],
+              ['Behind By', `${pr.behind_by || 0} commits`],
+              ['Commits', `${pr.commits}`],
+            ])
+            .write();
+
+          // Post comment on PR
+          const commentBody = `## ${emoji} Merge Status Check
+
+          ${status}
+
+          ### Details:
+          - **Mergeable State:** \`${mergeableState}\`
+          - **Base branch:** \`${pr.base.ref}\`
+          - **Head branch:** \`${pr.head.ref}\`
+          - **Behind by:** ${pr.behind_by || 0} commits
+          - **Total commits:** ${pr.commits}
+
+          ${mergeable === false ? '### ⚠️ Action Required\n\n**Resolve merge conflicts by:**\n\n1. Update your branch with latest changes:\n   ```bash\n   git checkout ' + pr.head.ref + '\n   git fetch origin\n   git merge origin/' + pr.base.ref + '\n   ```\n2. Resolve any conflicts in your editor\n3. Commit the resolved files:\n   ```bash\n   git add .\n   git commit -m "fix: resolve merge conflicts"\n   ```\n4. Push to update the PR:\n   ```bash\n   git push\n   ```' : '### ✅ All Clear\n\nNo merge conflicts detected. This PR can be merged once all required checks pass and approvals are obtained.'}
+
+          ---
+
+          <sub>🔄 This check runs automatically on every push</sub>
+          `;
+
+          // Find existing merge check comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const existingComment = comments.find(comment =>
+            comment.user.type === 'Bot' &&
+            comment.body.includes('Merge Status Check')
+          );
+
+          // Update or create comment
+          if (existingComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existingComment.id,
+              body: commentBody
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });
+          }
+
+          // Set output for other jobs to use
+          console.log(`Mergeable: ${mergeable}, State: ${mergeableState}`);
+
+          // Don't fail the job, just report
+          if (mergeable === false) {
+            core.warning('⚠️ Merge conflicts detected - manual resolution required');
+          }

@@ -13,43 +13,47 @@ from src.cache_manager import CacheManager
 
 
 # API Configuration
-ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query'
+ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/query"
 API_TIMEOUT = 30  # seconds
 MAX_API_RETRIES = 3
 RETRY_BACKOFF_FACTOR = 2  # exponential backoff
-DEFAULT_OUTPUT_SIZE = 'full'
+DEFAULT_OUTPUT_SIZE = "full"
 
 
 # Custom Exceptions
 class APIError(Exception):
     """Base exception for API-related errors."""
+
     pass
 
 
 class RateLimitError(APIError):
     """Raised when API rate limit is exceeded."""
+
     pass
 
 
 class InvalidSymbolError(APIError):
     """Raised when stock symbol is not found."""
+
     pass
 
 
 class NetworkError(APIError):
     """Raised when network request fails."""
+
     pass
 
 
 # Response key mappings for different time series functions
 TIME_SERIES_KEYS = {
-    'TIME_SERIES_DAILY': 'Time Series (Daily)',
-    'TIME_SERIES_DAILY_ADJUSTED': 'Time Series (Daily)',
-    'TIME_SERIES_WEEKLY': 'Weekly Time Series',
-    'TIME_SERIES_WEEKLY_ADJUSTED': 'Weekly Adjusted Time Series',
-    'TIME_SERIES_MONTHLY': 'Monthly Time Series',
-    'TIME_SERIES_MONTHLY_ADJUSTED': 'Monthly Adjusted Time Series',
-    'TIME_SERIES_INTRADAY': None  # Will be determined dynamically
+    "TIME_SERIES_DAILY": "Time Series (Daily)",
+    "TIME_SERIES_DAILY_ADJUSTED": "Time Series (Daily)",
+    "TIME_SERIES_WEEKLY": "Weekly Time Series",
+    "TIME_SERIES_WEEKLY_ADJUSTED": "Weekly Adjusted Time Series",
+    "TIME_SERIES_MONTHLY": "Monthly Time Series",
+    "TIME_SERIES_MONTHLY_ADJUSTED": "Monthly Adjusted Time Series",
+    "TIME_SERIES_INTRADAY": None,  # Will be determined dynamically
 }
 
 
@@ -78,8 +82,8 @@ class AlphaVantageClient:
         load_dotenv()
 
         # Get API key
-        self.api_key = api_key or os.getenv('ALPHA_VANTAGE_API_KEY')
-        if not self.api_key or self.api_key == 'your_api_key_here':
+        self.api_key = api_key or os.getenv("ALPHA_VANTAGE_API_KEY")
+        if not self.api_key or self.api_key == "your_api_key_here":
             raise APIError("Alpha Vantage API key not configured")
 
         self.base_url = ALPHA_VANTAGE_BASE_URL
@@ -103,49 +107,46 @@ class AlphaVantageClient:
             InvalidSymbolError: If symbol not found
         """
         # Add API key to parameters
-        params['apikey'] = self.api_key
+        params["apikey"] = self.api_key
 
         try:
-            response = requests.get(
-                self.base_url,
-                params=params,
-                timeout=API_TIMEOUT
-            )
+            response = requests.get(self.base_url, params=params, timeout=API_TIMEOUT)
             response.raise_for_status()
 
             data = response.json()
 
             # Check for API error messages
-            if 'Error Message' in data:
+            if "Error Message" in data:
                 raise InvalidSymbolError(f"Invalid symbol: {data['Error Message']}")
 
-            if 'Note' in data:
+            if "Note" in data:
                 # Rate limit message
                 raise RateLimitError(
                     "API rate limit reached (25 requests per day). "
                     "Try again tomorrow or use cached data."
                 )
 
-            if 'Information' in data and 'rate limit' in data['Information'].lower():
-                raise RateLimitError(
-                    "API rate limit reached. "
-                    f"Details: {data['Information']}"
-                )
+            if "Information" in data and "rate limit" in data["Information"].lower():
+                raise RateLimitError("API rate limit reached. " f"Details: {data['Information']}")
 
             return data
 
         except requests.exceptions.Timeout:
             if retry_count < MAX_API_RETRIES:
-                wait_time = RETRY_BACKOFF_FACTOR ** retry_count
-                print(f"Request timeout. Retrying in {wait_time} seconds... (attempt {retry_count + 1}/{MAX_API_RETRIES})")
+                wait_time = RETRY_BACKOFF_FACTOR**retry_count
+                print(
+                    f"Request timeout. Retrying in {wait_time} seconds... (attempt {retry_count + 1}/{MAX_API_RETRIES})"
+                )
                 time.sleep(wait_time)
                 return self._make_request(params, retry_count + 1)
             raise NetworkError("Request timeout after multiple retries")
 
         except requests.exceptions.ConnectionError:
             if retry_count < MAX_API_RETRIES:
-                wait_time = RETRY_BACKOFF_FACTOR ** retry_count
-                print(f"Connection error. Retrying in {wait_time} seconds... (attempt {retry_count + 1}/{MAX_API_RETRIES})")
+                wait_time = RETRY_BACKOFF_FACTOR**retry_count
+                print(
+                    f"Connection error. Retrying in {wait_time} seconds... (attempt {retry_count + 1}/{MAX_API_RETRIES})"
+                )
                 time.sleep(wait_time)
                 return self._make_request(params, retry_count + 1)
             raise NetworkError("Connection error after multiple retries")
@@ -168,11 +169,11 @@ class AlphaVantageClient:
             APIError: If response format is invalid
         """
         # Determine the correct time series key
-        if function == 'TIME_SERIES_INTRADAY':
+        if function == "TIME_SERIES_INTRADAY":
             # Find the time series key dynamically for intraday
             time_series_key = None
             for key in data.keys():
-                if key.startswith('Time Series'):
+                if key.startswith("Time Series"):
                     time_series_key = key
                     break
         else:
@@ -187,11 +188,11 @@ class AlphaVantageClient:
             raise APIError("No time series data in API response")
 
         # Convert to DataFrame
-        df = pd.DataFrame.from_dict(time_series_data, orient='index')
+        df = pd.DataFrame.from_dict(time_series_data, orient="index")
 
         # Convert index to datetime
         df.index = pd.to_datetime(df.index)
-        df.index.name = 'Date'
+        df.index.name = "Date"
 
         # Sort by date (oldest to newest)
         df.sort_index(inplace=True)
@@ -200,8 +201,8 @@ class AlphaVantageClient:
         column_mapping = {}
         for col in df.columns:
             # Extract the name after the number and period
-            if '. ' in col:
-                clean_name = col.split('. ')[1]
+            if ". " in col:
+                clean_name = col.split(". ")[1]
                 # Capitalize first letter
                 clean_name = clean_name.capitalize()
                 column_mapping[col] = clean_name
@@ -212,12 +213,17 @@ class AlphaVantageClient:
 
         # Convert all columns to float
         for col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
         return df
 
-    def fetch_stock_data(self, symbol: str, function: str, interval: Optional[str] = None,
-                        outputsize: str = DEFAULT_OUTPUT_SIZE) -> pd.DataFrame:
+    def fetch_stock_data(
+        self,
+        symbol: str,
+        function: str,
+        interval: Optional[str] = None,
+        outputsize: str = DEFAULT_OUTPUT_SIZE,
+    ) -> pd.DataFrame:
         """
         Fetch stock data from Alpha Vantage API with caching.
 
@@ -239,7 +245,7 @@ class AlphaVantageClient:
         # Validate inputs
         symbol = symbol.upper().strip()
 
-        if function == 'TIME_SERIES_INTRADAY' and not interval:
+        if function == "TIME_SERIES_INTRADAY" and not interval:
             raise APIError("Interval required for TIME_SERIES_INTRADAY")
 
         # Check cache first
@@ -250,15 +256,11 @@ class AlphaVantageClient:
                 return cached_data
 
         # Build request parameters
-        params = {
-            'function': function,
-            'symbol': symbol,
-            'outputsize': outputsize
-        }
+        params = {"function": function, "symbol": symbol, "outputsize": outputsize}
 
         # Add interval for intraday
         if interval:
-            params['interval'] = interval
+            params["interval"] = interval
 
         print(f"Fetching {function} data for {symbol}...")
 
@@ -275,8 +277,9 @@ class AlphaVantageClient:
 
         return df
 
-    def get_daily(self, symbol: str, adjusted: bool = False,
-                 outputsize: str = DEFAULT_OUTPUT_SIZE) -> pd.DataFrame:
+    def get_daily(
+        self, symbol: str, adjusted: bool = False, outputsize: str = DEFAULT_OUTPUT_SIZE
+    ) -> pd.DataFrame:
         """
         Get daily time series data.
 
@@ -288,7 +291,7 @@ class AlphaVantageClient:
         Returns:
             pandas DataFrame with daily data
         """
-        function = 'TIME_SERIES_DAILY_ADJUSTED' if adjusted else 'TIME_SERIES_DAILY'
+        function = "TIME_SERIES_DAILY_ADJUSTED" if adjusted else "TIME_SERIES_DAILY"
         return self.fetch_stock_data(symbol, function, outputsize=outputsize)
 
     def get_weekly(self, symbol: str, adjusted: bool = False) -> pd.DataFrame:
@@ -302,7 +305,7 @@ class AlphaVantageClient:
         Returns:
             pandas DataFrame with weekly data
         """
-        function = 'TIME_SERIES_WEEKLY_ADJUSTED' if adjusted else 'TIME_SERIES_WEEKLY'
+        function = "TIME_SERIES_WEEKLY_ADJUSTED" if adjusted else "TIME_SERIES_WEEKLY"
         return self.fetch_stock_data(symbol, function)
 
     def get_monthly(self, symbol: str, adjusted: bool = False) -> pd.DataFrame:
@@ -316,11 +319,12 @@ class AlphaVantageClient:
         Returns:
             pandas DataFrame with monthly data
         """
-        function = 'TIME_SERIES_MONTHLY_ADJUSTED' if adjusted else 'TIME_SERIES_MONTHLY'
+        function = "TIME_SERIES_MONTHLY_ADJUSTED" if adjusted else "TIME_SERIES_MONTHLY"
         return self.fetch_stock_data(symbol, function)
 
-    def get_intraday(self, symbol: str, interval: str = '5min',
-                    outputsize: str = DEFAULT_OUTPUT_SIZE) -> pd.DataFrame:
+    def get_intraday(
+        self, symbol: str, interval: str = "5min", outputsize: str = DEFAULT_OUTPUT_SIZE
+    ) -> pd.DataFrame:
         """
         Get intraday time series data.
 
@@ -332,4 +336,4 @@ class AlphaVantageClient:
         Returns:
             pandas DataFrame with intraday data
         """
-        return self.fetch_stock_data(symbol, 'TIME_SERIES_INTRADAY', interval, outputsize)
+        return self.fetch_stock_data(symbol, "TIME_SERIES_INTRADAY", interval, outputsize)

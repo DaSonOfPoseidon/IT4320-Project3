@@ -35,8 +35,16 @@ def validate_environment():
         print(f"\n{e}\n")
         sys.exit(1)
 
+
 from datetime import datetime
-from src.api_client import AlphaVantageClient, APIError, RateLimitError, InvalidSymbolError, NetworkError
+from src.api_client import (
+    AlphaVantageClient,
+    APIError,
+    RateLimitError,
+    InvalidSymbolError,
+    NetworkError,
+)
+
 
 def get_stock_symbol():
     """
@@ -165,16 +173,11 @@ def get_intraday_interval():
 
     while True:
         choice = input("\nSelect interval (1-5): ").strip()
-        intervals = {
-            '1': '1min',
-            '2': '5min',
-            '3': '15min',
-            '4': '30min',
-            '5': '60min'
-        }
+        intervals = {"1": "1min", "2": "5min", "3": "15min", "4": "30min", "5": "60min"}
         if choice in intervals:
             return intervals[choice]
         print("Error: Please enter a number between 1 and 5")
+
 
 def get_date_input(prompt):
     """
@@ -295,22 +298,6 @@ def main():
         # Get interval if intraday time series selected
         interval = None
         if requires_interval:
-        # Initialize API client
-        try:
-            client = AlphaVantageClient()
-        except APIError as e:
-            print(f"\nError: {e}")
-            print("Please ensure your .env file is configured with a valid API key.")
-            sys.exit(1)
-
-        # Get user inputs
-        symbol = get_stock_symbol()
-        chart_type = get_chart_type()
-        time_series = get_time_series_function()
-
-        # Get intraday interval if needed
-        interval = None
-        if time_series == 'TIME_SERIES_INTRADAY':
             interval = get_intraday_interval()
 
         begin_date, end_date = get_date_range()
@@ -340,7 +327,9 @@ def main():
         try:
             stock_data = client.fetch_stock_data(symbol, time_series, interval)
             print(f"\nSuccessfully retrieved {len(stock_data)} data points")
-            print(f"Date range in data: {stock_data.index[0].date()} to {stock_data.index[-1].date()}")
+            print(
+                f"Date range in data: {stock_data.index[0].date()} to {stock_data.index[-1].date()}"
+            )
 
             # Display preview of data
             print(f"\nData preview (first 5 rows):")

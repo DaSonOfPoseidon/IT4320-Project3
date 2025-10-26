@@ -11,7 +11,7 @@ from typing import Optional, Dict, Any
 
 
 # Cache configuration
-CACHE_DIR = '.cache/stock_data'
+CACHE_DIR = ".cache/stock_data"
 CACHE_EXPIRATION_HOURS = 24
 
 
@@ -40,8 +40,9 @@ class CacheManager:
         # Create cache directory if it doesn't exist
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def _generate_cache_key(self, symbol: str, function: str, interval: Optional[str] = None,
-                           outputsize: str = 'full') -> str:
+    def _generate_cache_key(
+        self, symbol: str, function: str, interval: Optional[str] = None, outputsize: str = "full"
+    ) -> str:
         """
         Generate unique cache key based on query parameters.
 
@@ -91,8 +92,9 @@ class CacheManager:
 
         return mod_time > expiration_time
 
-    def get_cached_data(self, symbol: str, function: str, interval: Optional[str] = None,
-                       outputsize: str = 'full') -> Optional[pd.DataFrame]:
+    def get_cached_data(
+        self, symbol: str, function: str, interval: Optional[str] = None, outputsize: str = "full"
+    ) -> Optional[pd.DataFrame]:
         """
         Retrieve cached data if available and valid.
 
@@ -113,15 +115,21 @@ class CacheManager:
         cache_path = self._get_cache_path(cache_key)
 
         try:
-            with open(cache_path, 'rb') as f:
+            with open(cache_path, "rb") as f:
                 data = pickle.load(f)
             return data
         except Exception as e:
             print(f"Warning: Failed to load cache file {cache_key}: {e}")
             return None
 
-    def save_to_cache(self, data: pd.DataFrame, symbol: str, function: str,
-                     interval: Optional[str] = None, outputsize: str = 'full') -> bool:
+    def save_to_cache(
+        self,
+        data: pd.DataFrame,
+        symbol: str,
+        function: str,
+        interval: Optional[str] = None,
+        outputsize: str = "full",
+    ) -> bool:
         """
         Save DataFrame to cache.
 
@@ -139,7 +147,7 @@ class CacheManager:
         cache_path = self._get_cache_path(cache_key)
 
         try:
-            with open(cache_path, 'wb') as f:
+            with open(cache_path, "wb") as f:
                 pickle.dump(data, f)
             return True
         except Exception as e:
@@ -155,7 +163,7 @@ class CacheManager:
         """
         removed_count = 0
 
-        for cache_file in self.cache_dir.glob('*.pkl'):
+        for cache_file in self.cache_dir.glob("*.pkl"):
             mod_time = datetime.fromtimestamp(cache_file.stat().st_mtime)
             expiration_time = datetime.now() - timedelta(hours=self.expiration_hours)
 
@@ -177,7 +185,7 @@ class CacheManager:
         """
         removed_count = 0
 
-        for cache_file in self.cache_dir.glob('*.pkl'):
+        for cache_file in self.cache_dir.glob("*.pkl"):
             try:
                 cache_file.unlink()
                 removed_count += 1
@@ -193,7 +201,7 @@ class CacheManager:
         Returns:
             Dictionary with cache statistics
         """
-        cache_files = list(self.cache_dir.glob('*.pkl'))
+        cache_files = list(self.cache_dir.glob("*.pkl"))
         total_files = len(cache_files)
 
         valid_files = 0
@@ -212,9 +220,9 @@ class CacheManager:
                 expired_files += 1
 
         return {
-            'total_files': total_files,
-            'valid_files': valid_files,
-            'expired_files': expired_files,
-            'total_size_mb': round(total_size / (1024 * 1024), 2),
-            'cache_directory': str(self.cache_dir)
+            "total_files": total_files,
+            "valid_files": valid_files,
+            "expired_files": expired_files,
+            "total_size_mb": round(total_size / (1024 * 1024), 2),
+            "cache_directory": str(self.cache_dir),
         }
