@@ -1,0 +1,95 @@
+# Coverage.py configuration file
+# This file configures code coverage reporting for pytest
+
+[run]
+# Source code to measure
+source =
+    src
+    main.py
+
+# Files/directories to omit from coverage
+omit =
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */venv/*
+    */env/*
+    */.venv/*
+    */site-packages/*
+    .cache/*
+    setup.py
+
+# Enable branch coverage (not just line coverage)
+branch = True
+
+# Run coverage in parallel mode (useful for multiprocessing)
+parallel = False
+
+# Write relative file paths (required for CI/CD)
+relative_files = True
+
+[report]
+# Precision for coverage percentage (2 decimal places)
+precision = 2
+
+# Show lines that weren't executed
+show_missing = True
+
+# Don't skip files with 100% coverage
+skip_covered = False
+
+# Skip empty files
+skip_empty = True
+
+# Lines to exclude from coverage consideration
+exclude_lines =
+    # Standard pragma for excluding lines
+    pragma: no cover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+    def __str__
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run
+    if __name__ == .__main__.:
+    if __name__==.__main__.:
+
+    # Don't complain about abstract methods
+    @abstractmethod
+    @abc.abstractmethod
+
+    # Type checking blocks
+    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
+
+    # Pass statements (often used as placeholders)
+    pass
+
+    # Ellipsis (used in stubs and protocols)
+    \.\.\.
+
+# Fail if coverage is below this threshold
+fail_under = 70
+
+# Sort the report by coverage percentage
+sort = Cover
+
+[html]
+# Directory for HTML coverage report
+directory = htmlcov
+
+# Title for HTML report
+title = Stock Data Visualization - Code Coverage Report
+
+[xml]
+# Output file for XML coverage report (used by CI/CD)
+output = coverage.xml
+
+[json]
+# Output file for JSON coverage report
+output = coverage.json
+pretty_print = True
