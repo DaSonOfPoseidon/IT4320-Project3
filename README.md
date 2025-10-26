@@ -128,7 +128,7 @@ python -m pytest tests/test_input_validator.py
 ## Alpha Vantage API
 
 This project uses the Alpha Vantage API for historical stock data.
-- Free tier: 500 requests per day
+- Free tier: 25 requests per day
 - Get your API key: https://www.alphavantage.co/support/#api-key
 
 ## Team Members
