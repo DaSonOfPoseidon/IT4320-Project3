@@ -4,6 +4,7 @@
 
 import sys
 from datetime import datetime
+from src.api_client import AlphaVantageClient, APIError, RateLimitError, InvalidSymbolError, NetworkError
 
 def get_stock_symbol():
     # Get stock symbol from user input
@@ -59,6 +60,28 @@ def get_time_series_function():
             return functions[choice]
         print("Error: Please enter a number between 1 and 7")
 
+def get_intraday_interval():
+    # Get intraday interval selection
+    print("\nAvailable intraday intervals:")
+    print("1. 1 minute")
+    print("2. 5 minutes")
+    print("3. 15 minutes")
+    print("4. 30 minutes")
+    print("5. 60 minutes")
+
+    while True:
+        choice = input("\nSelect interval (1-5): ").strip()
+        intervals = {
+            '1': '1min',
+            '2': '5min',
+            '3': '15min',
+            '4': '30min',
+            '5': '60min'
+        }
+        if choice in intervals:
+            return intervals[choice]
+        print("Error: Please enter a number between 1 and 5")
+
 def get_date_input(prompt):
     # Get and validate date input in YYYY-MM-DD format
     while True:
@@ -87,10 +110,24 @@ def main():
     print("Alpha Vantage API Integration\n")
 
     try:
+        # Initialize API client
+        try:
+            client = AlphaVantageClient()
+        except APIError as e:
+            print(f"\nError: {e}")
+            print("Please ensure your .env file is configured with a valid API key.")
+            sys.exit(1)
+
         # Get user inputs
         symbol = get_stock_symbol()
         chart_type = get_chart_type()
         time_series = get_time_series_function()
+
+        # Get intraday interval if needed
+        interval = None
+        if time_series == 'TIME_SERIES_INTRADAY':
+            interval = get_intraday_interval()
+
         begin_date, end_date = get_date_range()
 
         # Display collected information
@@ -98,21 +135,50 @@ def main():
         print(f"Stock Symbol: {symbol}")
         print(f"Chart Type: {chart_type}")
         print(f"Time Series: {time_series}")
+        if interval:
+            print(f"Interval: {interval}")
         print(f"Date Range: {begin_date} to {end_date}")
+        print("=" * 30)
 
-        # Placeholder for future functionality
-        print(f"\n[PLACEHOLDER] Fetching {time_series} data for {symbol}...")
-        print(f"[PLACEHOLDER] Filtering data from {begin_date} to {end_date}...")
+        # Fetch stock data from API
+        print()
+        try:
+            stock_data = client.fetch_stock_data(symbol, time_series, interval)
+            print(f"\nSuccessfully retrieved {len(stock_data)} data points")
+            print(f"Date range in data: {stock_data.index[0].date()} to {stock_data.index[-1].date()}")
+
+            # Display preview of data
+            print(f"\nData preview (first 5 rows):")
+            print(stock_data.head())
+
+        except RateLimitError as e:
+            print(f"\n{e}")
+            print("Please try again tomorrow or use a different API key.")
+            sys.exit(1)
+        except InvalidSymbolError as e:
+            print(f"\n{e}")
+            print("Please verify the stock symbol and try again.")
+            sys.exit(1)
+        except NetworkError as e:
+            print(f"\n{e}")
+            print("Please check your internet connection and try again.")
+            sys.exit(1)
+        except APIError as e:
+            print(f"\nAPI Error: {e}")
+            sys.exit(1)
+
+        # Placeholder for future functionality (Phase 4 and 5)
+        print(f"\n[PLACEHOLDER] Filtering data from {begin_date} to {end_date}...")
         print(f"[PLACEHOLDER] Generating {chart_type} chart...")
         print("[PLACEHOLDER] Opening chart in default browser...")
 
-        print("\n Application completed successfully!")
+        print("\nApplication completed successfully!")
 
     except KeyboardInterrupt:
         print("\n\nApplication interrupted by user. Goodbye!")
         sys.exit(0)
     except Exception as e:
-        print(f"\nError: {e}")
+        print(f"\nUnexpected error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
