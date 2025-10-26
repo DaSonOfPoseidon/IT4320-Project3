@@ -102,10 +102,10 @@ This project uses the Alpha Vantage API for historical stock data.
 
 ## Team Members
 
-DaSonOfPoseidon
-2
-3
-4
+- DaSonOfPoseidon
+- 2
+- 3
+- 4
 
 ## License
 
