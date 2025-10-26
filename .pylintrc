@@ -1,0 +1,115 @@
+[MAIN]
+# Use multiple processes to speed up Pylint
+jobs=0
+
+# Pickle collected data for later comparisons
+persistent=yes
+
+# List of plugins (as comma separated values of python module names)
+load-plugins=
+
+# Discover python modules and packages in the file system subtree
+recursive=yes
+
+[MESSAGES CONTROL]
+# Disable specific warnings that are too strict or not relevant
+disable=
+    # Design
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-locals,
+    too-many-branches,
+    too-many-statements,
+    too-many-instance-attributes,
+    # Documentation
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    # Formatting (handled by black)
+    line-too-long,
+    bad-continuation,
+    # Less critical
+    fixme,
+    broad-except,
+    global-statement,
+    # Allow print statements in CLI app
+    print-statement,
+
+[REPORTS]
+# Set the output format
+output-format=colorized
+
+# Tells whether to display a full report or only the messages
+reports=no
+
+# Python expression which should return a score less than or equal to 10
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+
+[BASIC]
+# Good variable names which should always be accepted
+good-names=i,j,k,ex,Run,_,df,x,y,e
+
+# Regular expression matching correct function names
+function-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Regular expression matching correct variable names
+variable-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Regular expression matching correct constant names
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+
+# Regular expression matching correct class names
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=100
+
+# Maximum number of lines in a module
+max-module-lines=1000
+
+# String used as indentation unit
+indent-string='    '
+
+# Expected format of line ending
+expected-line-ending-format=LF
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=7
+
+# Maximum number of locals for function / method body
+max-locals=20
+
+# Maximum number of return / yield for function / method body
+max-returns=6
+
+# Maximum number of branch for function / method body
+max-branches=15
+
+# Maximum number of statements in function / method body
+max-statements=50
+
+# Maximum number of attributes for a class
+max-attributes=10
+
+[IMPORTS]
+# Deprecated modules which should not be used
+deprecated-modules=optparse,imp
+
+[EXCEPTIONS]
+# Exceptions that will emit a warning when caught
+overgeneral-exceptions=BaseException,Exception
+
+[SIMILARITIES]
+# Minimum lines number of a similarity
+min-similarity-lines=4
+
+# Ignore comments when computing similarities
+ignore-comments=yes
+
+# Ignore docstrings when computing similarities
+ignore-docstrings=yes
+
+# Ignore imports when computing similarities
+ignore-imports=yes
