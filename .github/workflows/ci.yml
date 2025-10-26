@@ -182,7 +182,7 @@ jobs:
 
           ---
 
-          <sub>📌 This comment updates automatically on each push. Current build: ${{ github.sha.substring(0, 7) }}</sub>
+          <sub>📌 This comment updates automatically on each push. Current build: ${context.sha.substring(0, 7)}</sub>
           `;
 
           // Find existing comment
