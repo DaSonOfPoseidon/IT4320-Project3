@@ -322,8 +322,16 @@ def main():
         print(f"Date Range: {begin_date} to {end_date}")
         print("=" * 30)
 
-        # Fetch stock data from API
+        # Initialize API client
         print()
+        try:
+            client = AlphaVantageClient()
+        except APIError as e:
+            print(f"\nError initializing API client: {e}")
+            print("Please ensure your .env file is configured with a valid API key.")
+            sys.exit(1)
+
+        # Fetch stock data from API
         try:
             stock_data = client.fetch_stock_data(symbol, time_series, interval)
             print(f"\nSuccessfully retrieved {len(stock_data)} data points")
