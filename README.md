@@ -11,6 +11,7 @@ A command-line interface application for visualizing historical stock data using
 ## 🚀 Features
 
 ✅ **Complete & Working:**
+
 - 📊 **Multiple Chart Types**: Line charts, candlestick charts, OHLC bars, volume overlays
 - 📈 **7 Time Series Functions**: Daily, weekly, monthly, intraday (with 5 interval options)
 - 🔍 **Comprehensive Input Validation**: Stock symbols, dates, date ranges with smart error messages
@@ -21,6 +22,7 @@ A command-line interface application for visualizing historical stock data using
 - 🤖 **CI/CD Automation**: GitHub Actions with automated testing, linting, and PR reports
 
 🚧 **In Progress:**
+
 - Phase 4: Date range filtering and data processing
 - Phase 5: Interactive chart generation
 
@@ -34,17 +36,20 @@ A command-line interface application for visualizing historical stock data using
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/DaSonOfPoseidon/IT4320-Project3.git
    cd IT4320-Project3
    ```
 
 2. **Install dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. **Configure API key**
+
    ```bash
    cp .env.example .env
    # Edit .env and add your Alpha Vantage API key:
@@ -52,6 +57,7 @@ A command-line interface application for visualizing historical stock data using
    ```
 
 4. **Run the application**
+
    ```bash
    python main.py
    ```
@@ -103,12 +109,14 @@ IT4320-Project3/
 ### ✨ Completed Features (Phases 1-3)
 
 #### 🎨 User Interface
+
 - Interactive CLI with clear prompts and instructions
 - Configuration summary display before data fetching
 - Keyboard interrupt (Ctrl+C) handling at all input points
 - Helpful error messages with retry attempt tracking
 
 #### 🔐 Input Validation
+
 - **Stock Symbols**: 1-5 uppercase letters, helpful error messages with examples
 - **Chart Types**: 4 options (line, candlestick, OHLC, volume) with descriptions
 - **Time Series**: 7 Alpha Vantage functions with automatic interval selection
@@ -122,6 +130,7 @@ IT4320-Project3/
   - Order validation (end date must be after begin date)
 
 #### 🌐 API Integration
+
 - **Alpha Vantage Client**: Support for all 7 time series functions
 - **Smart Caching**: 24-hour disk cache with automatic expiration
 - **Error Handling**:
@@ -132,6 +141,7 @@ IT4320-Project3/
 - **Data Processing**: Clean DataFrame output with datetime indexing
 
 #### 🧪 Testing & Quality
+
 - **75 Passing Tests** across 3 test files
 - **75% Code Coverage** (exceeds 70% minimum requirement)
 - **GitHub Actions CI/CD**:
@@ -195,6 +205,7 @@ mypy . --install-types --non-interactive
 ### CI/CD Pipeline
 
 Every push and pull request automatically:
+
 - ✅ Runs 75 tests across Python 3.9, 3.10, 3.11
 - 📊 Generates coverage reports (artifacts downloadable)
 - 🤖 Posts automated PR comments with:
@@ -254,6 +265,7 @@ This project uses the [Alpha Vantage API](https://www.alphavantage.co/) for hist
 - **Get API Key**: https://www.alphavantage.co/support/#api-key
 
 **Supported Time Series Functions:**
+
 1. `TIME_SERIES_DAILY` - Daily time series data
 2. `TIME_SERIES_DAILY_ADJUSTED` - Daily with split/dividend adjustments
 3. `TIME_SERIES_WEEKLY` - Weekly time series data

@@ -121,8 +121,10 @@ black --check . && pylint $(git ls-files '*.py') && mypy . && pytest
 ## CI/CD Pipeline
 
 Our GitHub Actions workflow runs automatically on:
-- Every push to `main`, `develop`, or `phase-*` branches
+- Every push to `main` (via merged pull requests), `develop`, or `phase-*` branches
 - Every pull request to `main` or `develop`
+
+**Note**: Since `main` is protected, all changes must go through pull requests. The CI/CD checks will run on your PR before it can be merged.
 
 ### Pipeline Jobs
 
@@ -230,6 +232,8 @@ if __name__ == "__main__":  # pragma: no cover
 
 ## Branch Workflow
 
+**Important**: The `main` branch is protected and requires pull requests for all changes. Direct pushes to `main` are disabled.
+
 1. **Create feature branch** from `main`
    ```bash
    git checkout main
@@ -249,14 +253,21 @@ if __name__ == "__main__":  # pragma: no cover
    black .
    ```
 
-3. **Push and create PR**
+3. **Push and create Pull Request**
    ```bash
    git add .
    git commit -m "feat: add your feature"
    git push origin feature/your-feature-name
    ```
 
-4. **Wait for CI/CD checks** before requesting review
+   Then create a Pull Request on GitHub:
+   - Go to the repository on GitHub
+   - Click "Compare & pull request"
+   - Set base branch to `main`
+   - Fill in PR description with what changed and why
+   - Submit the pull request
+
+4. **Wait for CI/CD checks** to pass before requesting review
 
 ## Common Issues
 
