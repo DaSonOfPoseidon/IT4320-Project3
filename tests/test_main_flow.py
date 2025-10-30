@@ -1,8 +1,10 @@
 # /usr/bin/env python3
 # Integration tests for main application flow
 
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+from datetime import datetime
 
+import pandas as pd
 import main
 
 
@@ -219,11 +221,21 @@ class TestMainFlow:
     @patch("main.get_chart_type", return_value="line")
     @patch("main.get_time_series_function", return_value=("TIME_SERIES_DAILY", False))
     @patch("main.get_date_range", return_value=("2024-01-01", "2024-12-31"))
+    @patch("main.AlphaVantageClient")
     @patch("builtins.print")
     def test_complete_flow_without_interval(
-        self, mock_print, mock_date_range, mock_time_series, mock_chart, mock_symbol, mock_env
+        self, mock_print, mock_client, mock_date_range, mock_time_series, mock_chart, mock_symbol, mock_env
     ):
         """Test complete application flow without intraday interval."""
+        # Mock the API client instance and its methods
+        mock_instance = mock_client.return_value
+        # Create a mock DataFrame with proper index
+        mock_df = pd.DataFrame(
+            {"close": [100, 101, 102]},
+            index=pd.DatetimeIndex([datetime(2024, 1, 1), datetime(2024, 1, 2), datetime(2024, 1, 3)])
+        )
+        mock_instance.fetch_stock_data.return_value = mock_df
+
         main.main()
         # Verify all input functions were called
         mock_env.assert_called_once()
@@ -238,10 +250,12 @@ class TestMainFlow:
     @patch("main.get_time_series_function", return_value=("TIME_SERIES_INTRADAY", True))
     @patch("main.get_intraday_interval", return_value="5min")
     @patch("main.get_date_range", return_value=("2024-01-01", "2024-01-31"))
+    @patch("main.AlphaVantageClient")
     @patch("builtins.print")
     def test_complete_flow_with_interval(
         self,
         mock_print,
+        mock_client,
         mock_date_range,
         mock_interval,
         mock_time_series,
@@ -250,6 +264,15 @@ class TestMainFlow:
         mock_env,
     ):
         """Test complete application flow with intraday interval."""
+        # Mock the API client instance and its methods
+        mock_instance = mock_client.return_value
+        # Create a mock DataFrame with proper index
+        mock_df = pd.DataFrame(
+            {"close": [100, 101, 102]},
+            index=pd.DatetimeIndex([datetime(2024, 1, 1), datetime(2024, 1, 2), datetime(2024, 1, 3)])
+        )
+        mock_instance.fetch_stock_data.return_value = mock_df
+
         main.main()
         # Verify interval function was called for intraday
         mock_interval.assert_called_once()
