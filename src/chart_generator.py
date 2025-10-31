@@ -22,7 +22,6 @@ def generate_chart(data, chart_type, symbol):
 
     print(f"Generating {chart_type} chart for {symbol}...")
 
-    # Create Plotly figure
     fig = go.Figure()
 
     # --- LINE CHART ---
@@ -44,6 +43,18 @@ def generate_chart(data, chart_type, symbol):
             low=data[low_col],
             close=data[close_col],
             name="Candlestick"
+        ))
+        fig.update_xaxes(rangeslider_visible=False)
+
+    # --- OHLC CHART ---
+    elif chart_type == "ohlc":
+        fig.add_trace(go.Ohlc(
+            x=data.index,
+            open=data[open_col],
+            high=data[high_col],
+            low=data[low_col],
+            close=data[close_col],
+            name="OHLC"
         ))
         fig.update_xaxes(rangeslider_visible=False)
 
@@ -69,7 +80,6 @@ def generate_chart(data, chart_type, symbol):
 
     # --- VOLUME OVERLAY CHART ---
     elif chart_type == "volume":
-        # Price as line chart
         fig.add_trace(go.Scatter(
             x=data.index,
             y=data[close_col],
@@ -79,7 +89,6 @@ def generate_chart(data, chart_type, symbol):
             yaxis="y1"
         ))
 
-        # Volume as bar overlay (secondary axis)
         if volume_col and volume_col in data.columns:
             fig.add_trace(go.Bar(
                 x=data.index,
@@ -114,11 +123,10 @@ def generate_chart(data, chart_type, symbol):
         legend=dict(x=0, y=1)
     )
 
-    # Save and open HTML chart
     output_path = os.path.abspath(f"{symbol}_{chart_type}_chart.html")
     fig.write_html(output_path)
     safe_open_browser(output_path)
-
     print(f"Chart saved to: {output_path}")
     return output_path
+
 
