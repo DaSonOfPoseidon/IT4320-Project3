@@ -27,7 +27,9 @@ from src.input_validator import (
     ChoiceValidator,
     format_error_message,
 )
-
+from src.data_processor import (
+    filter_date_range,
+)
 
 def validate_environment():
     """
@@ -320,9 +322,12 @@ def main():
                 f"Date range in data: {stock_data.index[0].date()} to {stock_data.index[-1].date()}"
             )
 
+            # Filter data by date range
+            filtered_data = filter_date_range(stock_data, begin_date, end_date)
+
             # Display preview of data
             print("\nData preview (first 5 rows):")
-            print(stock_data.head())
+            print(filtered_data.head())
 
         except RateLimitError as e:
             print(f"\n{e}")
