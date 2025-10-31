@@ -31,6 +31,10 @@ from src.data_processor import (
     filter_date_range,
 )
 
+from src.chart_generator import (
+    generate_chart,
+)
+
 def validate_environment():
     """
     Validate environment configuration at startup.
@@ -328,6 +332,9 @@ def main():
             # Display preview of data
             print("\nData preview (first 5 rows):")
             print(filtered_data.head())
+
+            # Generate and display chart
+            generate_chart(filtered_data, chart_type, symbol)
 
         except RateLimitError as e:
             print(f"\n{e}")
