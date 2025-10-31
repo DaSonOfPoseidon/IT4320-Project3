@@ -31,6 +31,10 @@ from src.data_processor import (
     filter_date_range,
 )
 
+from src.chart_generator import (
+    generate_chart,
+)
+
 def validate_environment():
     """
     Validate environment configuration at startup.
@@ -324,6 +328,9 @@ def main():
 
             # Filter data by date range
             filtered_data = filter_date_range(stock_data, begin_date, end_date)
+
+            # Generate and display chart
+            generate_chart(filtered_data, chart_type, symbol)
 
             # Display preview of data
             print("\nData preview (first 5 rows):")
