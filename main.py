@@ -329,12 +329,12 @@ def main():
             # Filter data by date range
             filtered_data = filter_date_range(stock_data, begin_date, end_date)
 
+            # Generate and display chart
+            generate_chart(filtered_data, chart_type, symbol)
+
             # Display preview of data
             print("\nData preview (first 5 rows):")
             print(filtered_data.head())
-
-            # Generate and display chart
-            generate_chart(filtered_data, chart_type, symbol)
 
         except RateLimitError as e:
             print(f"\n{e}")

@@ -14,10 +14,15 @@ def generate_chart(data, chart_type, symbol):
     
     # Normalize common Alpha Vantage column names
     cols = {c.lower(): c for c in data.columns}
-    open_col = cols.get("1. open", cols.get("open"))
-    high_col = cols.get("2. high", cols.get("high"))
-    low_col = cols.get("3. low", cols.get("low"))
-    close_col = cols.get("4. close", cols.get("close"))
+    open_col = cols.get("1. open") or cols.get("open") or "close"
+    high_col = cols.get("2. high") or cols.get("high") or "close"
+    low_col = cols.get("3. low") or cols.get("low") or "close"
+    close_col = cols.get("4. close") or cols.get("close") or next(iter(cols.values()))
+
+    if close_col not in data.columns:
+        print("No valid price columns found to plot.")
+        return None
+
 
     print(f"Generating {chart_type} chart for {symbol}...")
 
