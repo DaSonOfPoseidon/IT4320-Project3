@@ -3,6 +3,10 @@ import plotly.graph_objects as go
 import webbrowser
 import os
 
+def safe_open_browser(path):
+    if os.environ.get("CI", "false").lower() != "true":
+        webbrowser.open(f"file://{path}")
+
 def generate_chart(data, chart_type, symbol):
     if data.empty:
         print("No data available to generate chart.")
@@ -79,7 +83,7 @@ def generate_chart(data, chart_type, symbol):
     # Save and open HTML chart
     output_path = os.path.abspath(f"{symbol}_{chart_type}_chart.html")
     fig.write_html(output_path)
-    webbrowser.open(f"file://{output_path}")
+    safe_open_browser(output_path)
 
     print(f"Chart saved to: {output_path}")
     return output_path
