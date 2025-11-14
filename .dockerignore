@@ -1,0 +1,63 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.pytest_cache
+.coverage
+.coveragerc
+htmlcov
+
+# Virtual environments
+venv
+env
+ENV
+.venv
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation
+*.md
+CONTRIBUTING.md
+docs/
+
+# CI/CD
+.github/workflows
+
+# Development dependencies
+requirements-dev.txt
+
+# Test files
+tests/
+pytest.ini
+
+# Generated chart files (not needed in container)
+*.html
+!templates/*.html
+
+# Environment files (should be mounted, not copied)
+.env
+.env.example
+
+# Cache directory (will be mounted as volume)
+cache/
+
+# Logs
+*.log

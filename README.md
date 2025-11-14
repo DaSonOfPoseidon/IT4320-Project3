@@ -59,6 +59,110 @@ A command-line interface application for visualizing historical stock data using
    python main.py
    ```
 
+## 🌐 Web Application (Flask + Docker)
+
+The application now includes a web interface built with Flask and can be deployed using Docker!
+
+### Running Locally with Flask
+
+1. **Install dependencies including Flask**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Configure your API key** (if not already done)
+
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Alpha Vantage API key
+   ```
+
+3. **Run the Flask application**
+
+   ```bash
+   python app.py
+   ```
+
+4. **Access the web interface**
+
+   Open your browser and navigate to: `http://localhost:5000`
+
+### Running with Docker
+
+#### Prerequisites
+
+- Docker installed ([Get Docker](https://docs.docker.com/get-docker/))
+- Docker Compose installed (included with Docker Desktop)
+
+#### Using Docker Compose (Recommended)
+
+1. **Configure your API key**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Alpha Vantage API key:
+   # ALPHA_VANTAGE_API_KEY=your_actual_key_here
+   ```
+
+2. **Build and run the container**
+
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Access the web application**
+
+   Open your browser and navigate to: `http://localhost:5000`
+
+4. **Stop the container**
+
+   ```bash
+   docker-compose down
+   ```
+
+#### Using Docker Directly
+
+1. **Build the Docker image**
+
+   ```bash
+   docker build -t stock-chart-generator .
+   ```
+
+2. **Run the container**
+
+   ```bash
+   docker run -p 5000:5000 --env-file .env -v ./cache:/app/cache stock-chart-generator
+   ```
+
+3. **Access the web application**
+
+   Open your browser and navigate to: `http://localhost:5000`
+
+### Web Application Features
+
+- 📋 **Stock Symbol Dropdown**: Pre-populated with 20 popular stocks
+- 🎨 **Interactive Forms**: Easy-to-use web interface for chart configuration
+- 📊 **Embedded Charts**: Charts display directly in the browser with full interactivity
+- ⚠️ **Error Handling**: User-friendly error pages with troubleshooting tips
+- 💾 **Persistent Cache**: Cache is stored in a Docker volume for efficiency
+- 🔄 **Auto-refresh**: Modify stock symbols by editing `stock_symbols.json`
+
+### File Structure for Web App
+
+```
+IT4320-Project3/
+├── app.py                        # Flask web application
+├── stock_symbols.json            # Stock symbols for dropdown menu
+├── templates/                    # HTML templates
+│   ├── index.html                # Main form page
+│   ├── result.html               # Chart display page
+│   └── error.html                # Error page
+├── Dockerfile                    # Docker container configuration
+├── docker-compose.yml            # Docker Compose configuration
+└── .dockerignore                 # Files to exclude from Docker image
+```
+
 ## 🏗️ Project Structure
 
 ```

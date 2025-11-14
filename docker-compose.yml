@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  stock-chart-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stock-chart-generator
+    ports:
+      - "5001:5000"
+    environment:
+      # Load API key from .env file
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+    volumes:
+      # Mount .env file for API key configuration
+      - ./.env:/app/.env:ro
+      # Persist cache directory
+      - ./cache:/app/cache
+    restart: unless-stopped
+    networks:
+      - stock-chart-network
+
+networks:
+  stock-chart-network:
+    driver: bridge

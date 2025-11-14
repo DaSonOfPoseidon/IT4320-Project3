@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Stock Chart</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        #chart {
+            width: 100%;
+            min-height: 600px;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 2px solid #f88;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #c33;
+        }
+
+        .error-message h3 {
+            margin: 0 0 10px 0;
+            color: #c33;
+        }
+
+        .error-details {
+            background: #f9f9f9;
+            border-left: 3px solid #f88;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 {{ title }}</h1>
+        <p>{{ subtitle }}</p>
+    </div>
+
+    {% if chart_info %}
+    <div class="info-box">
+        <h3>Chart Information</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Stock Symbol</span>
+                <span class="info-value">{{ chart_info.symbol }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Chart Type</span>
+                <span class="info-value">{{ chart_info.chart_type }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Time Series</span>
+                <span class="info-value">{{ chart_info.time_series }}</span>
+            </div>
+            {% if chart_info.date_range %}
+            <div class="info-item">
+                <span class="info-label">Date Range</span>
+                <span class="info-value">{{ chart_info.date_range }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="chart-container">
+        <div id="chart"></div>
+    </div>
+
+    <div class="button-group">
+        <a href="/" class="btn btn-primary">← Generate Another Chart</a>
+    </div>
+
+    <script>
+        // Show loading state
+        document.getElementById('chart').innerHTML = '<div class="loading">📊 Loading chart...</div>';
+
+        // Embed the Plotly chart
+        try {
+            const chartData = {{ chart_dict | tojson | safe }};
+            console.log('Chart data loaded successfully', chartData);
+
+            // Validate chart data
+            if (!chartData || !chartData.data || !chartData.layout) {
+                throw new Error('Invalid chart data structure received from server');
+            }
+
+            if (chartData.data.length === 0) {
+                throw new Error('No data traces found in chart data');
+            }
+
+            // Render the chart
+            Plotly.newPlot('chart', chartData.data, chartData.layout, {responsive: true});
+            console.log('Chart rendered successfully');
+
+        } catch (error) {
+            console.error('Error loading chart:', error);
+
+            // Display user-friendly error message
+            const errorHTML = `
+                <div class="error-message">
+                    <h3>⚠️ Chart Rendering Error</h3>
+                    <p><strong>Unable to display the chart.</strong></p>
+                    <p>Error: ${error.message}</p>
+                    <div class="error-details">
+                        <strong>Debugging Information:</strong><br>
+                        Error Type: ${error.name}<br>
+                        Stack: ${error.stack ? error.stack.substring(0, 200) + '...' : 'Not available'}
+                    </div>
+                    <p style="margin-top: 15px;">
+                        <strong>Possible causes:</strong><br>
+                        • Data format mismatch between API and chart generator<br>
+                        • Missing or invalid stock data<br>
+                        • JavaScript serialization error<br>
+                        • Network timeout or incomplete data fetch
+                    </p>
+                    <p style="margin-top: 10px;">
+                        Please try again or contact support if the issue persists.
+                    </p>
+                </div>
+            `;
+            document.getElementById('chart').innerHTML = errorHTML;
+        }
+    </script>
+</body>
+</html>

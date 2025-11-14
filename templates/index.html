@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Chart Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #086c33 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        select, input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        select:focus, input[type="text"]:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .date-range {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .intraday-interval {
+            display: none;
+        }
+
+        .intraday-interval.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .date-range {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Stock Chart Generator</h1>
+        <p class="subtitle">Visualize stock market data with interactive charts</p>
+
+        <form method="POST" action="/generate-chart">
+            <div class="form-group">
+                <label for="symbol">Stock Symbol</label>
+                <select id="symbol" name="symbol" required>
+                    <option value="">-- Select a stock --</option>
+                    {% for stock in stocks %}
+                    <option value="{{ stock.symbol }}">{{ stock.symbol }} - {{ stock.name }}</option>
+                    {% endfor %}
+                </select>
+                <p class="help-text">Choose from popular stocks listed above</p>
+            </div>
+
+            <div class="form-group">
+                <label for="chart_type">Chart Type</label>
+                <select id="chart_type" name="chart_type" required>
+                    <option value="">-- Select chart type --</option>
+                    <option value="1">Line Chart</option>
+                    <option value="2">Candlestick Chart</option>
+                    <option value="3">OHLC Bar Chart</option>
+                    <option value="4">Volume Overlay Chart</option>
+                </select>
+                <p class="help-text">Different visualization styles for stock data</p>
+            </div>
+
+            <div class="form-group">
+                <label for="time_series">Time Series Function</label>
+                <select id="time_series" name="time_series" required>
+                    <option value="">-- Select time series --</option>
+                    <option value="1">Daily</option>
+                    <option value="2">Daily Adjusted</option>
+                    <option value="3">Weekly</option>
+                    <option value="4">Weekly Adjusted</option>
+                    <option value="5">Monthly</option>
+                    <option value="6">Monthly Adjusted</option>
+                    <option value="7">Intraday (same-day trading)</option>
+                </select>
+                <p class="help-text">Select the data granularity for your chart</p>
+            </div>
+
+            <div class="form-group intraday-interval" id="intraday-interval">
+                <label for="interval">Intraday Interval</label>
+                <select id="interval" name="interval">
+                    <option value="">-- Select interval --</option>
+                    <option value="1min">1 minute</option>
+                    <option value="5min">5 minutes</option>
+                    <option value="15min">15 minutes</option>
+                    <option value="30min">30 minutes</option>
+                    <option value="60min">60 minutes</option>
+                </select>
+                <p class="help-text">Required for intraday time series</p>
+            </div>
+
+            <div class="form-group">
+                <label>Date Range (Optional)</label>
+                <div class="date-range">
+                    <div>
+                        <input type="date" id="start_date" name="start_date" placeholder="Start Date">
+                        <p class="help-text">From date</p>
+                    </div>
+                    <div>
+                        <input type="date" id="end_date" name="end_date" placeholder="End Date">
+                        <p class="help-text">To date</p>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Generate Chart 🚀</button>
+        </form>
+    </div>
+
+    <script>
+        // Show/hide intraday interval based on time series selection
+        document.getElementById('time_series').addEventListener('change', function() {
+            const intradayDiv = document.getElementById('intraday-interval');
+            const intervalSelect = document.getElementById('interval');
+
+            if (this.value === '7') {
+                intradayDiv.classList.add('show');
+                intervalSelect.required = true;
+            } else {
+                intradayDiv.classList.remove('show');
+                intervalSelect.required = false;
+                intervalSelect.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
