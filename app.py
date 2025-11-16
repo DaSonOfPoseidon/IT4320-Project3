@@ -93,7 +93,7 @@ def generate_web_chart(data, chart_type, symbol):
     if chart_type == "line":
         fig.add_trace(
             go.Scatter(
-                x=date_list, y=close_list, mode="lines", name="Close Price", line=dict(color="blue")
+                x=date_list, y=close_list, mode="lines", name="Close Price", line=dict(color="#FFC107", width=2)
             )
         )
 
@@ -107,6 +107,10 @@ def generate_web_chart(data, chart_type, symbol):
                 low=low_list,
                 close=close_list,
                 name="Candlestick",
+                increasing_line_color="#FFC107",
+                decreasing_line_color="#000000",
+                increasing_fillcolor="#FFD54F",
+                decreasing_fillcolor="#424242",
             )
         )
         fig.update_xaxes(rangeslider_visible=False)
@@ -121,6 +125,8 @@ def generate_web_chart(data, chart_type, symbol):
                 low=low_list,
                 close=close_list,
                 name="OHLC",
+                increasing_line_color="#FFC107",
+                decreasing_line_color="#000000",
             )
         )
         fig.update_xaxes(rangeslider_visible=False)
@@ -133,7 +139,7 @@ def generate_web_chart(data, chart_type, symbol):
                 y=close_list,
                 mode="lines",
                 name="Close Price",
-                line=dict(color="blue"),
+                line=dict(color="#FFC107", width=2),
                 yaxis="y1",
             )
         )
@@ -144,7 +150,7 @@ def generate_web_chart(data, chart_type, symbol):
                     x=date_list,
                     y=volume_list,
                     name="Volume",
-                    marker_color="rgba(255, 165, 0, 0.5)",
+                    marker_color="rgba(255, 193, 7, 0.3)",
                     yaxis="y2",
                 )
             )
@@ -160,10 +166,16 @@ def generate_web_chart(data, chart_type, symbol):
     # Layout styling
     fig.update_layout(
         title=f"{symbol.upper()} Stock Data ({chart_type.capitalize()} Chart)",
+        title_font=dict(size=24, color="#FFC107"),
         xaxis_title="Date",
         template="plotly_dark",
         hovermode="x unified",
-        legend=dict(x=0, y=1),
+        legend=dict(x=0, y=1, bgcolor="rgba(0,0,0,0.7)", bordercolor="#FFC107", borderwidth=1),
+        plot_bgcolor="#1a1a1a",
+        paper_bgcolor="#0d0d0d",
+        font=dict(color="#FFD54F"),
+        xaxis=dict(gridcolor="#333333", color="#FFC107"),
+        yaxis=dict(gridcolor="#333333", color="#FFC107"),
     )
 
     # Convert figure to JSON string
