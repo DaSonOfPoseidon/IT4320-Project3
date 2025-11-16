@@ -2,6 +2,7 @@
 from datetime import datetime
 import pandas as pd
 
+
 def filter_date_range(data, start_date, end_date):
     try:
         # Convert date inputs

@@ -227,7 +227,7 @@ class TestCacheManager:
             # Restore permissions for cleanup
             try:
                 os.chmod(cache_path, 0o666)
-            except:
+            except OSError:
                 pass
 
     def test_clear_expired_cache(self, tmp_path):

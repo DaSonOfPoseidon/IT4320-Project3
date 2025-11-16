@@ -3,9 +3,11 @@ import plotly.graph_objects as go
 import webbrowser
 import os
 
+
 def safe_open_browser(path):
     if os.environ.get("CI", "false").lower() != "true":
         webbrowser.open(f"file://{path}")
+
 
 def generate_chart(data, chart_type, symbol):
     if data.empty:
@@ -26,88 +28,92 @@ def generate_chart(data, chart_type, symbol):
 
     # --- LINE CHART ---
     if chart_type == "line":
-        fig.add_trace(go.Scatter(
-            x=data.index,
-            y=data[close_col],
-            mode="lines",
-            name="Close Price",
-            line=dict(color="blue")
-        ))
+        fig.add_trace(
+            go.Scatter(
+                x=data.index,
+                y=data[close_col],
+                mode="lines",
+                name="Close Price",
+                line=dict(color="blue"),
+            )
+        )
 
     # --- CANDLESTICK CHART ---
     elif chart_type == "candlestick":
-        fig.add_trace(go.Candlestick(
-            x=data.index,
-            open=data[open_col],
-            high=data[high_col],
-            low=data[low_col],
-            close=data[close_col],
-            name="Candlestick"
-        ))
+        fig.add_trace(
+            go.Candlestick(
+                x=data.index,
+                open=data[open_col],
+                high=data[high_col],
+                low=data[low_col],
+                close=data[close_col],
+                name="Candlestick",
+            )
+        )
         fig.update_xaxes(rangeslider_visible=False)
 
     # --- OHLC CHART ---
     elif chart_type == "ohlc":
-        fig.add_trace(go.Ohlc(
-            x=data.index,
-            open=data[open_col],
-            high=data[high_col],
-            low=data[low_col],
-            close=data[close_col],
-            name="OHLC"
-        ))
+        fig.add_trace(
+            go.Ohlc(
+                x=data.index,
+                open=data[open_col],
+                high=data[high_col],
+                low=data[low_col],
+                close=data[close_col],
+                name="OHLC",
+            )
+        )
         fig.update_xaxes(rangeslider_visible=False)
 
     # --- BAR CHART ---
     elif chart_type == "bar":
-        fig.add_trace(go.Bar(
-            x=data.index,
-            y=data[close_col],
-            name="Close Price",
-            marker_color="orange"
-        ))
+        fig.add_trace(
+            go.Bar(x=data.index, y=data[close_col], name="Close Price", marker_color="orange")
+        )
 
     # --- AREA CHART ---
     elif chart_type == "area":
-        fig.add_trace(go.Scatter(
-            x=data.index,
-            y=data[close_col],
-            fill="tozeroy",
-            mode="lines",
-            name="Close Price",
-            line=dict(color="green")
-        ))
+        fig.add_trace(
+            go.Scatter(
+                x=data.index,
+                y=data[close_col],
+                fill="tozeroy",
+                mode="lines",
+                name="Close Price",
+                line=dict(color="green"),
+            )
+        )
 
     # --- VOLUME OVERLAY CHART ---
     elif chart_type == "volume":
-        fig.add_trace(go.Scatter(
-            x=data.index,
-            y=data[close_col],
-            mode="lines",
-            name="Close Price",
-            line=dict(color="blue"),
-            yaxis="y1"
-        ))
+        fig.add_trace(
+            go.Scatter(
+                x=data.index,
+                y=data[close_col],
+                mode="lines",
+                name="Close Price",
+                line=dict(color="blue"),
+                yaxis="y1",
+            )
+        )
 
         if volume_col and volume_col in data.columns:
-            fig.add_trace(go.Bar(
-                x=data.index,
-                y=data[volume_col],
-                name="Volume",
-                marker_color="rgba(255, 165, 0, 0.5)",
-                yaxis="y2"
-            ))
+            fig.add_trace(
+                go.Bar(
+                    x=data.index,
+                    y=data[volume_col],
+                    name="Volume",
+                    marker_color="rgba(255, 165, 0, 0.5)",
+                    yaxis="y2",
+                )
+            )
         else:
             print("Volume data not found — showing price only.")
 
         fig.update_layout(
             yaxis=dict(title="Price (USD)", side="left"),
-            yaxis2=dict(
-                title="Volume",
-                overlaying="y",
-                side="right",
-                showgrid=False
-            )
+            yaxis2=dict(title="Volume", overlaying="y", side="right", showgrid=False),
         )
 
     else:
@@ -120,7 +126,7 @@ def generate_chart(data, chart_type, symbol):
         xaxis_title="Date",
         template="plotly_dark",
         hovermode="x unified",
-        legend=dict(x=0, y=1)
+        legend=dict(x=0, y=1),
     )
 
     output_path = os.path.abspath(f"{symbol}_{chart_type}_chart.html")
@@ -128,5 +134,3 @@ def generate_chart(data, chart_type, symbol):
     safe_open_browser(output_path)
     print(f"Chart saved to: {output_path}")
     return output_path
-
-

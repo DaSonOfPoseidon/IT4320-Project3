@@ -46,7 +46,7 @@ pytest
 pytest -v
 
 # Run specific test file
-pytest tests/test_main.py
+pytest tests/test_api_client.py
 
 # Run tests matching a pattern
 pytest -k "test_stock_symbol"
@@ -56,7 +56,7 @@ pytest -k "test_stock_symbol"
 
 ```bash
 # Generate coverage report
-pytest --cov=src --cov=main --cov-report=html
+pytest --cov=src --cov=app --cov-report=html
 
 # Open HTML report in browser
 # Windows
@@ -76,10 +76,10 @@ xdg-open htmlcov/index.html
 pylint $(git ls-files '*.py')
 
 # Lint specific file
-pylint main.py
+pylint app.py
 
 # Lint with specific rcfile
-pylint --rcfile=.pylintrc main.py
+pylint --rcfile=.pylintrc app.py
 ```
 
 ### Run Code Formatting (Black)
@@ -95,7 +95,7 @@ black --diff .
 black .
 
 # Format specific file
-black main.py
+black app.py
 ```
 
 ### Run Type Checking (MyPy)
@@ -105,7 +105,7 @@ black main.py
 mypy .
 
 # Type check specific file
-mypy main.py
+mypy app.py
 
 # Install missing type stubs
 mypy --install-types --non-interactive .
@@ -150,11 +150,11 @@ Our GitHub Actions workflow runs automatically on:
 ```
 tests/
 ├── __init__.py
-├── conftest.py          # Shared fixtures
-├── test_main.py         # CLI tests
-├── test_api_client.py   # API integration tests
-├── test_data_processor.py
-└── test_chart_generator.py
+├── conftest.py              # Shared fixtures
+├── test_main_flow.py        # Integration tests
+├── test_api_client.py       # API integration tests
+├── test_input_validator.py  # Input validation tests
+└── test_data_processor.py   # Data processing tests
 ```
 
 ### Test Naming Conventions
@@ -247,7 +247,7 @@ if __name__ == "__main__":  # pragma: no cover
    pytest
 
    # Check coverage
-   pytest --cov=src --cov=main
+   pytest --cov=src --cov=app
 
    # Format code
    black .
@@ -290,7 +290,7 @@ pip install -r requirements.txt
 **Solution**: Delete old coverage data
 ```bash
 rm -rf .coverage htmlcov/ coverage.xml
-pytest --cov=src --cov=main
+pytest --cov=src --cov=app
 ```
 
 ### Issue: Black and existing code style conflict

@@ -2,37 +2,75 @@
 
 [![CI/CD Pipeline](https://github.com/DaSonOfPoseidon/IT4320-Project3/actions/workflows/ci.yml/badge.svg)](https://github.com/DaSonOfPoseidon/IT4320-Project3/actions/workflows/ci.yml)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Code Coverage](https://img.shields.io/badge/coverage-75%25-brightgreen.svg)](https://github.com/DaSonOfPoseidon/IT4320-Project3)
+[![Code Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen.svg)](https://github.com/DaSonOfPoseidon/IT4320-Project3)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A command-line interface application for visualizing historical stock data using the Alpha Vantage API with intelligent caching, comprehensive input validation, and automated testing.
+A web-based application for visualizing historical stock data using the Alpha Vantage API with intelligent caching, comprehensive input validation, and Docker deployment support.
 
 ## 🚀 Features
 
 ✅ **Complete & Working:**
 
+- 🌐 **Web-Based Interface**: Modern Flask web application with intuitive forms
 - 📊 **Multiple Chart Types**: Line charts, candlestick charts, OHLC bars, volume overlays
 - 📈 **7 Time Series Functions**: Daily, weekly, monthly, intraday (with 5 interval options)
+- 📋 **Stock Symbol Dropdown**: Pre-populated with 20 popular stocks for easy selection
 - 🔍 **Comprehensive Input Validation**: Stock symbols, dates, date ranges with smart error messages
 - 🌐 **Alpha Vantage API Integration**: Full support with automatic error handling
 - 💾 **Intelligent Caching**: 24-hour disk cache to minimize API calls (25 request/day limit)
 - ⚡ **Network Resilience**: Automatic retry with exponential backoff
 - 📅 **Date Range Filtering**: Process and filter data based on user-specified date ranges
-- 📈 **Interactive Chart Generation**: Plotly-powered HTML charts with automatic browser opening
-- 🧪 **75 Passing Tests**: Comprehensive test suite with 75% code coverage
+- 📈 **Interactive Chart Generation**: Plotly-powered HTML charts embedded in browser
+- 🐳 **Docker Support**: Full containerization with Docker Compose for easy deployment
+- 🧪 **50 Passing Tests**: Comprehensive test suite with 80% code coverage
 - 🤖 **CI/CD Automation**: GitHub Actions with automated testing, linting, and PR reports
 
 ## 📋 Quick Start
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Docker and Docker Compose ([Get Docker](https://docs.docker.com/get-docker/))
 - Alpha Vantage API key ([Get one free](https://www.alphavantage.co/support/#api-key))
 
-### Installation
+### Running with Docker (Recommended)
 
 1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/DaSonOfPoseidon/IT4320-Project3.git
+   cd IT4320-Project3
+   ```
+
+2. **Configure API key**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Alpha Vantage API key:
+   # ALPHA_VANTAGE_API_KEY=your_actual_key_here
+   ```
+
+3. **Build and run with Docker Compose**
+
+   ```bash
+   docker-compose up --build
+   ```
+
+4. **Access the web application**
+
+   Open your browser and navigate to: `http://localhost:5000`
+
+5. **Stop the application**
+
+   ```bash
+   docker-compose down
+   ```
+
+## 🌐 Alternative: Running Locally with Flask
+
+If you prefer not to use Docker, you can run the Flask application directly:
+
+1. **Clone the repository** (if not already done)
 
    ```bash
    git clone https://github.com/DaSonOfPoseidon/IT4320-Project3.git
@@ -45,83 +83,26 @@ A command-line interface application for visualizing historical stock data using
    pip install -r requirements.txt
    ```
 
-3. **Configure API key**
-
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your Alpha Vantage API key:
-   # ALPHA_VANTAGE_API_KEY=your_actual_key_here
-   ```
-
-4. **Run the application**
-
-   ```bash
-   python main.py
-   ```
-
-## 🌐 Web Application (Flask + Docker)
-
-The application now includes a web interface built with Flask and can be deployed using Docker!
-
-### Running Locally with Flask
-
-1. **Install dependencies including Flask**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Configure your API key** (if not already done)
+3. **Configure your API key**
 
    ```bash
    cp .env.example .env
    # Edit .env and add your Alpha Vantage API key
    ```
 
-3. **Run the Flask application**
+4. **Run the Flask application**
 
    ```bash
    python app.py
    ```
 
-4. **Access the web interface**
+5. **Access the web interface**
 
    Open your browser and navigate to: `http://localhost:5000`
 
-### Running with Docker
+## 🐳 Advanced Docker Usage
 
-#### Prerequisites
-
-- Docker installed ([Get Docker](https://docs.docker.com/get-docker/))
-- Docker Compose installed (included with Docker Desktop)
-
-#### Using Docker Compose (Recommended)
-
-1. **Configure your API key**
-
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your Alpha Vantage API key:
-   # ALPHA_VANTAGE_API_KEY=your_actual_key_here
-   ```
-
-2. **Build and run the container**
-
-   ```bash
-   docker-compose up --build
-   ```
-
-3. **Access the web application**
-
-   Open your browser and navigate to: `http://localhost:5000`
-
-4. **Stop the container**
-
-   ```bash
-   docker-compose down
-   ```
-
-#### Using Docker Directly
+### Using Docker Directly (Without Compose)
 
 1. **Build the Docker image**
 
@@ -139,81 +120,76 @@ The application now includes a web interface built with Flask and can be deploye
 
    Open your browser and navigate to: `http://localhost:5000`
 
-### Web Application Features
+## ✨ Web Application Features
 
-- 📋 **Stock Symbol Dropdown**: Pre-populated with 20 popular stocks
-- 🎨 **Interactive Forms**: Easy-to-use web interface for chart configuration
-- 📊 **Embedded Charts**: Charts display directly in the browser with full interactivity
+- 📋 **Stock Symbol Dropdown**: Pre-populated with 20 popular stocks for easy selection
+- 🎨 **Interactive Forms**: Intuitive web interface for configuring chart parameters
+- 📊 **Embedded Charts**: Charts display directly in the browser with full Plotly interactivity
 - ⚠️ **Error Handling**: User-friendly error pages with troubleshooting tips
-- 💾 **Persistent Cache**: Cache is stored in a Docker volume for efficiency
-- 🔄 **Auto-refresh**: Modify stock symbols by editing `stock_symbols.json`
-
-### File Structure for Web App
-
-```
-IT4320-Project3/
-├── app.py                        # Flask web application
-├── stock_symbols.json            # Stock symbols for dropdown menu
-├── templates/                    # HTML templates
-│   ├── index.html                # Main form page
-│   ├── result.html               # Chart display page
-│   └── error.html                # Error page
-├── Dockerfile                    # Docker container configuration
-├── docker-compose.yml            # Docker Compose configuration
-└── .dockerignore                 # Files to exclude from Docker image
-```
+- 💾 **Persistent Cache**: Cache is stored in a Docker volume for efficiency across restarts
+- 🔄 **Customizable Symbols**: Modify stock symbols by editing `stock_symbols.json`
+- 📱 **Responsive Design**: Works on desktop and mobile browsers
 
 ## 🏗️ Project Structure
 
 ```
 IT4320-Project3/
-├── main.py                       # CLI entry point with main application flow
+├── app.py                        # Flask web application entry point
+├── stock_symbols.json            # Stock symbols for dropdown menu
 ├── requirements.txt              # Production dependencies
 ├── requirements-dev.txt          # Development dependencies
 ├── .env.example                  # Environment variable template
+├── Dockerfile                    # Docker container configuration
+├── docker-compose.yml            # Docker Compose orchestration
+├── .dockerignore                 # Files excluded from Docker image
 ├── .coveragerc                   # Coverage configuration
 ├── pytest.ini                    # Pytest configuration
 ├── pyproject.toml                # Project metadata and tool configs
+│
+├── templates/                    # Flask HTML templates
+│   ├── index.html                # Main form page
+│   ├── result.html               # Chart display page
+│   └── error.html                # Error page with troubleshooting
 │
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                # CI/CD pipeline configuration
 │
-├── src/                          # Source code package
+├── src/                          # Core business logic package
 │   ├── __init__.py               # Package initialization
 │   ├── constants.py              # Configuration constants (chart types, time series)
-│   ├── input_validator.py        # Input validation utilities with retry logic
-│   ├── api_client.py             # Alpha Vantage API client
+│   ├── input_validator.py        # Input validation utilities
+│   ├── api_client.py             # Alpha Vantage API client with retry logic
 │   ├── cache_manager.py          # Intelligent response caching system
-│   ├── data_processor.py         # Data filtering and processing (Phase 4)
-│   └── chart_generator.py        # Chart generation with Plotly (Phase 5)
+│   ├── data_processor.py         # Data filtering and processing
+│   └── chart_generator.py        # Chart generation with Plotly
 │
-└── tests/                        # Test suite (75 tests, 75% coverage)
+└── tests/                        # Test suite (50 tests, 80% coverage)
     ├── __init__.py
     ├── test_input_validator.py   # 33 unit tests for validation logic
-    ├── test_api_client.py        # 16 tests for API client and caching
-    └── test_main_flow.py          # 26 integration tests for user flows
+    └── test_api_client.py        # 16 tests for API client and caching
 ```
 
 ## 🎯 Development Phases
 
 | Phase | Status | Description | Lead |
 |-------|--------|-------------|------|
-| **Phase 1** | ✅ Complete | Basic CLI skeleton and menu system | JK |
+| **Phase 1** | ✅ Complete | Project setup and architecture | JK |
 | **Phase 2** | ✅ Complete | Alpha Vantage API integration with caching | JK |
 | **Phase 3** | ✅ Complete | Enhanced input validation and error handling | JK |
 | **Phase 4** | ✅ Complete | Date range filtering and data processing | SA |
 | **Phase 5** | ✅ Complete | Interactive chart generation with Plotly | SA |
-| **Phase 6** | ✅ Complete | Polish, documentation, and final delivery | Team |
+| **Phase 6** | ✅ Complete | Web interface and Docker deployment | Team |
 
 ### ✨ Completed Features
 
-#### 🎨 User Interface
+#### 🌐 Web Interface
 
-- Interactive CLI with clear prompts and instructions
-- Configuration summary display before data fetching
-- Keyboard interrupt (Ctrl+C) handling at all input points
-- Helpful error messages with retry attempt tracking
+- Modern Flask web application with intuitive form-based input
+- Stock symbol dropdown pre-populated with popular stocks
+- Configuration form with date pickers and dropdown menus
+- User-friendly error pages with troubleshooting guidance
+- Embedded interactive Plotly charts in result pages
 
 #### 🔐 Input Validation
 
@@ -242,8 +218,8 @@ IT4320-Project3/
 
 #### 🧪 Testing & Quality
 
-- **75 Passing Tests** across 3 test files
-- **75% Code Coverage** (exceeds 70% minimum requirement)
+- **50 Passing Tests** across 2 test files
+- **80% Code Coverage** (exceeds 70% minimum requirement)
 - **GitHub Actions CI/CD**:
   - Automated testing on Python 3.9, 3.10, 3.11
   - Code quality checks (Pylint, Black, MyPy)
@@ -259,17 +235,17 @@ IT4320-Project3/
 # Install development dependencies
 pip install -r requirements-dev.txt
 
-# Run all 75 tests
+# Run all tests
 pytest
 
 # Run with verbose output
 pytest -v
 
 # Run with coverage report
-pytest --cov=src --cov=main --cov-report=term-missing
+pytest --cov=src --cov=app --cov-report=term-missing
 
 # Generate HTML coverage report
-pytest --cov=src --cov=main --cov-report=html
+pytest --cov=src --cov=app --cov-report=html
 open htmlcov/index.html  # View in browser
 
 # Run specific test file
@@ -283,11 +259,10 @@ pytest tests/test_main_flow.py
 | Module | Statements | Coverage | Notes |
 |--------|------------|----------|-------|
 | `src/constants.py` | 11 | 100% | Configuration constants |
-| `src/cache_manager.py` | 83 | 93% | Cache system |
+| `src/cache_manager.py` | 82 | 93% | Cache system |
 | `src/input_validator.py` | 87 | 83% | Input validation |
-| `src/api_client.py` | 111 | 69% | API integration |
-| `main.py` | 202 | 67% | Application flow |
-| **TOTAL** | **496** | **75%** | ✅ Exceeds 70% requirement |
+| `src/api_client.py` | 110 | 68% | API integration |
+| **TOTAL** | **290** | **80%** | ✅ Exceeds 70% requirement |
 
 ### Code Quality Checks
 
@@ -306,7 +281,7 @@ mypy . --install-types --non-interactive
 
 Every push and pull request automatically:
 
-- ✅ Runs 75 tests across Python 3.9, 3.10, 3.11
+- ✅ Runs 50 tests across Python 3.9, 3.10, 3.11
 - 📊 Generates coverage reports (artifacts downloadable)
 - 🤖 Posts automated PR comments with:
   - Code quality metrics (Pylint score, Black formatting, MyPy results)
@@ -392,11 +367,11 @@ MIT License - See LICENSE file for details
 - **Alpha Vantage** for providing the stock data API
 - **University of Missouri - Columbia** IT4320 Course Staff
 - **Claude (Anthropic)** for assistance with:
-  - Comprehensive test suite development (75 tests with 75% coverage)
+  - Comprehensive test suite development (50 tests with 80% coverage)
   - README documentation and project structure
   - CI/CD pipeline configuration and GitHub Actions workflows
 - Contributors and reviewers
 
 ---
 
-**Project Status**: ✅ **PROJECT COMPLETE** - All 7 Phases Delivered | 75 Tests Passing | 75% Coverage
+**Project Status**: ✅ **PROJECT COMPLETE** - Web Application with Docker | 50 Tests Passing | 80% Coverage
